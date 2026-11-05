@@ -12,7 +12,10 @@ The brief is `README.md`. This file tracks the order of work, status, and decisi
 | 2026-11-05 | Factory CAN captures run on a Linux laptop with SocketCAN, so listen-only mode is enforced by the kernel driver. |
 | 2026-11-05 | Raw CAN captures are committed under `captures/` as gzip files. The factory bus captures cannot be redone after the swap, so git is their backup. |
 | 2026-11-05 | The USB protocol has one written spec (`docs/usb_protocol.md`), a JSON schema, and sample lines in `protocol/`. The tools, the firmware tests, and the app tests all check against the same samples. |
-| 2026-11-05 | Course maps with front, center, and back yardage are a primary feature (Track G). It is app only: GPS from the head unit's receiver, course data from OpenStreetMap stored on the head unit, holes drawn as vector shapes. A dual band GNSS module on the ESP32 is the upgrade path if head unit GPS is not accurate enough. |
+| 2026-11-05 | Course maps with front, center, and back yardage are a primary feature (Track G). It is app only: GPS from the head unit's receiver, course data from OpenStreetMap stored on the head unit. |
+| 2026-11-05 | Courses: Bell Nob (Gillette), Gillette Golf Club (Gillette), Casper Country Club (Casper), Newcastle Golf Course (Newcastle). |
+| 2026-11-05 | The course screen has two views: holes drawn as shapes, and an aerial photo view. Photos are USGS NAIP aerial imagery, which is public domain and so can be stored on the head unit with no account or license terms. |
+| 2026-11-05 | 3 to 5 yards of accuracy is good enough. The head unit's GPS is the plan; a GNSS module on the ESP32 only if on-course checks come out worse than that. |
 
 ## Hardware status
 
@@ -30,7 +33,7 @@ Cloud sessions cannot reach the PlatformIO registry, GitHub downloads, or `dl.go
 1. Run a Claude Code session on the laptop (Claude desktop app, or `claude remote-control` in a terminal inside the repo).
 2. Or allow these hosts in the cloud environment's network settings: `dl.google.com`, `api.registry.platformio.org`, `dl.registry.platformio.org`, `github.com`, `objects.githubusercontent.com`.
 
-The Python tools need only PyPI, which already works. Building course files needs the OpenStreetMap Overpass API (`overpass-api.de`), which cloud sessions also cannot reach, so run `tools/course_from_osm.py` on the laptop or allow that host too.
+The Python tools need only PyPI, which already works. Course files need the OpenStreetMap Overpass API (`overpass-api.de`) and aerial photos need the USGS imagery services (`basemap.nationalmap.gov`, `imagery.nationalmap.gov`). Cloud sessions cannot reach those either, so run the course tools on the laptop or allow those hosts too.
 
 ## Order of work
 
@@ -107,10 +110,15 @@ Done when the emulator shows the dash on fake data and the ESP32 streams simulat
 Starts once the Phase 0 app exists. Nothing here needs cart hardware until G3.
 
 G1, course data:
-- [ ] List the courses you play.
-- [ ] `tools/course_from_osm.py`: query OpenStreetMap for a course, write `courses/<name>.geojson`, and report each hole as complete or missing its green outline, number, tee, or line of play.
-- [ ] Fix gaps by tracing in the OpenStreetMap editor (iD), whose satellite layers are licensed for tracing. Downloading those satellite images for display in the app is not allowed, which is one reason holes are drawn as vector shapes.
-- [ ] Course file format documented in `docs/course_format.md`: GeoJSON features tagged with hole number and kind (green, tee, hole line, fairway, bunker, water, course boundary, and optional fixed front, center, back points).
+- [x] `tools/course_from_osm.py`: query OpenStreetMap for a course, write `courses/<name>.geojson`, and report each hole as ok, NO GREEN, or MISSING, with sanity checks on green depth, green size, and length for the par. Tested on synthetic OpenStreetMap data; not yet run against the live Overpass API.
+- [x] Course file format: `docs/course_format.md`. Yardage reference: `tools/courselib.py`.
+- [ ] Build and check each course (`courses/README.md` tracks them):
+  - [ ] Bell Nob, Gillette
+  - [ ] Gillette Golf Club, Gillette
+  - [ ] Casper Country Club, Casper
+  - [ ] Newcastle Golf Course, Newcastle
+- [ ] Fix gaps by tracing in the OpenStreetMap editor (iD), whose satellite layers are licensed for tracing. Those satellite images cannot be downloaded for the app, which is why the photo view uses USGS imagery.
+- [ ] `tools/course_imagery.py`: download USGS NAIP aerial imagery covering each course boundary into an MBTiles file (a standard tile file QGIS can open) next to the course file. NAIP is about 0.6 m per pixel, so a green 25 to 30 m across is about 45 pixels: fine as a background, soft up close. Written once the USGS services can be reached, so it is tested against the real service. If NAIP looks too soft, sharper commercial imagery needs an account and that vendor's SDK for offline use.
 
 G2, yardage engine and course screen (emulator):
 - `Yardage.kt`, pure Kotlin with unit tests:
@@ -122,13 +130,14 @@ G2, yardage engine and course screen (emulator):
   - Accuracy gate: dim the numbers and show the accuracy when it is worse than about 10 yards.
 - `LocationSource` with `ReplayLocation`: replays GPX tracks, or drives a simulated round along each hole's line of play, so the emulator shows real course data moving.
 - `CourseScreen`: hole drawn tee at the bottom and green at the top, cart dot, huge front, center, back numbers, hole and par, previous and next buttons, a compact strip with speed, SOC, blinkers, and warnings. Readable in sun: thick shapes, high contrast colors, no thin lines.
+- Two views with a toggle that is remembered: **Drawn** (shapes from the course file) and **Photo** (the aerial photo, rotated the same way, with the green outline, cart dot, and yardage drawn on top). Photo view falls back to Drawn when a course has no imagery file.
 - The course screen appears automatically inside a course boundary. The overlay shows center yardage over CarPlay.
 
 G3, on the real head unit:
 - [ ] Confirm the head unit has GPS and where its antenna goes (under the roof, clear sky view; the plastic roof does not block GPS).
 - [ ] Time to first fix after key on (the unit sleeps, so it should be a warm start).
 - [ ] Accuracy: park at about 20 sprinkler heads or 150 yard markers with known yardage to center and record the error in `docs/verify.md`. Typical head unit GPS is within 3 to 5 yards in open sky; trees make it worse.
-- [ ] If it is not good enough: add a dual band (L1 and L5) GNSS module to the ESP32 on a spare UART, send `lat`, `lon`, and `gps_acc_m` as new optional `state` fields (no protocol version change), and add an `EspGnss` location source.
+- [ ] Target is 3 to 5 yards. Only if it comes out worse: add a dual band (L1 and L5) GNSS module to the ESP32 on a spare UART, send `lat`, `lon`, and `gps_acc_m` as new optional `state` fields (no protocol version change), and add an `EspGnss` location source.
 
 ### Phase 6: Android polish
 - Overlay: a Compose view in an overlay window needs its lifecycle and saved state owners set by hand. Confirm on the real unit that it draws over the CarPlay app.

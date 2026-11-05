@@ -174,10 +174,12 @@ android/                      Gradle project, Kotlin, Jetpack Compose
         Yardage.kt            hole detection, front/center/back, smoothing (pure Kotlin)
       trips/                  trip odometer and energy, Room or DataStore
     res/xml/usb_device_filter.xml
-courses/                      course files (GeoJSON), one per course
+courses/                      course files (GeoJSON) and aerial photos (MBTiles), one per course
 tools/
   fake_esp.py                 emits the same JSON over TCP or a virtual serial port
   course_from_osm.py          builds a course file from OpenStreetMap and reports gaps
+  course_imagery.py           downloads public domain aerial photos for a course
+  courselib.py                course file format and yardage math (reference for the app)
   can_capture.py              labeled, listen-only CAN captures with keyboard markers
   can_log_analyze.py          finds changing bytes in raw CAN logs, aligned to markers
 docs/
@@ -202,13 +204,14 @@ docs/
 
 ## Course GPS requirements
 
-- **Position** comes from the head unit's GPS through `LocationSource`, using Android `LocationManager` directly so nothing depends on Google Play services. Mount the GPS antenna under the cart roof with a clear view of the sky, not in the dash. If the head unit is not accurate enough on the course (**VERIFY**), the upgrade path is a dual band GNSS module on the ESP32 that sends its position over USB as extra `state` fields.
+- **Position** comes from the head unit's GPS through `LocationSource`, using Android `LocationManager` directly so nothing depends on Google Play services. Mount the GPS antenna under the cart roof with a clear view of the sky, not in the dash. 3 to 5 yards of accuracy is the target. If the head unit does worse on the course (**VERIFY**), the upgrade path is a dual band GNSS module on the ESP32 that sends its position over USB as extra `state` fields.
 - **Course data** lives on the head unit as one GeoJSON file per course, so yardage works with no internet. Each hole needs at least a green outline and a hole number. A tee and the hole's line of play (tee to green) improve hole detection and the map. Fairways, bunkers, and water are drawn when present.
 - **Where course data comes from**: OpenStreetMap, which maps golf courses with `golf=hole`, `golf=green`, `golf=tee`, `golf=fairway`, `golf=bunker`, and water tags. `tools/course_from_osm.py` builds a course file on a laptop and reports which holes are missing a green or a number. Fix gaps by tracing in the OpenStreetMap editor (its satellite layers are licensed for tracing), then build the file again. Load courses onto the head unit by USB drive or ADB. The course screen shows "© OpenStreetMap contributors".
 - **Yardage**: center is the middle of the green outline. Front and back are where the line from the cart through the green center crosses the edge of the green, nearest and farthest, so they stay right when approaching from an angle. If a course file gives fixed front, center, or back points, those win. Show whole yards of horizontal distance.
 - **Steady numbers**: smooth the position. While the ESP32 reports the cart stopped, average every fix since it stopped. When GPS accuracy is worse than about 10 yards, dim the numbers and show the accuracy.
 - **Current hole**: chosen automatically from position, with large previous and next buttons to override.
-- **Course screen**: landscape, touch, no scrolling. The hole is drawn as vector shapes, rotated so the tee is at the bottom and the green at the top, with the cart as a dot. Front, center, and back yardage are the largest numbers on the screen, with hole number and par. A compact strip keeps speed, SOC, blinkers, and warning banners visible.
+- **Course screen**: landscape, touch, no scrolling. The hole is rotated so the tee is at the bottom and the green at the top, with the cart as a dot. Front, center, and back yardage are the largest numbers on the screen, with hole number and par. A compact strip keeps speed, SOC, blinkers, and warning banners visible.
+- **Two views**, toggled on the course screen: holes drawn as vector shapes from the course file, and an aerial photo view with the green outline, cart, and yardage drawn on top. Photos are USGS NAIP aerial imagery (public domain, so it can be stored offline), downloaded per course by `tools/course_imagery.py` on a laptop.
 - **Switching**: the course screen shows automatically while the cart is inside a known course boundary, and the drive dash otherwise, with a manual toggle.
 - Yardage math is pure Kotlin with unit tests. On the course, check it against sprinkler head and 150 yard marker distances.
 
@@ -273,7 +276,7 @@ Do these in order. Each phase ends with something that runs.
 
 **Phase 6: Android polish.** CarPlay button, overlay, night theme, trips, settings screen, calibration.
 
-**Track G: Course GPS.** App only, so it runs alongside the hardware phases once the Phase 0 app exists. G1: check OpenStreetMap coverage of the courses you play, fill gaps, build course files. G2: yardage engine and course screen, developed on replayed GPS in the emulator. G3: on the real head unit, measure GPS accuracy against known markers on the course and decide whether the ESP32 GNSS upgrade is needed.
+**Track G: Course GPS.** App only, so it runs alongside the hardware phases once the Phase 0 app exists. Courses: Bell Nob and Gillette Golf Club in Gillette, Casper Country Club, and Newcastle Golf Course. G1: check OpenStreetMap coverage of each course, fill gaps, build course files and aerial photo files. G2: yardage engine and course screen, developed on replayed GPS in the emulator. G3: on the real head unit, measure GPS accuracy against known markers on the course and decide whether the ESP32 GNSS upgrade is needed.
 
 ## Head unit setup (manual, not code)
 

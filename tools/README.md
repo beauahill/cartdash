@@ -6,6 +6,8 @@
 | `can_log_analyze.py` | Finds the bytes that matter in those captures |
 | `fake_esp.py` | Pretends to be the ESP32, for building the app without hardware |
 | `cartdash_proto.py` | Reference rules for reading the USB link, used by the other tools and tests |
+| `course_from_osm.py` | Builds a course file from OpenStreetMap and reports which holes are missing data |
+| `courselib.py` | Course file format and yardage math, the reference for the app's course code |
 
 Setup, once:
 
@@ -209,6 +211,40 @@ Write what you find in `docs/protocols.md` and `docs/factory_can.dbc`.
 ## Later: sniffing the Kelly
 
 Same tools, with `--bus kelly` so the captures go to `captures/kelly/`. If `scan` sees no frames at any bitrate with the controller powered, the Kelly may only answer requests. See Phase 4 in `docs/plan.md`.
+
+---
+
+# Course files
+
+`course_from_osm.py` turns a course on OpenStreetMap into a course file (`docs/course_format.md`) and prints a coverage report. It needs internet access to the Overpass API.
+
+See which courses OpenStreetMap knows about in Wyoming, with their IDs:
+
+```bash
+python3 tools/course_from_osm.py list --region US-WY
+```
+
+Build one by name. If more than one course matches, it lists them and asks for `--osm-id`:
+
+```bash
+python3 tools/course_from_osm.py build --name "Bell Nob" --region US-WY
+```
+
+```bash
+python3 tools/course_from_osm.py build --osm-id way/123456789
+```
+
+The report has one row per hole. A hole is **ok** when it has a green outline and a hole number. **NO GREEN** and **MISSING** rows need fixing on OpenStreetMap:
+
+1. Open the **Edit** link from the report (the iD editor, in a browser, free OpenStreetMap account).
+2. For each missing green, trace the green outline and tag it `golf=green`.
+3. For each hole, draw a line from the back tee to the middle of the green and tag it `golf=hole`, `ref=<hole number>`, `par=<par>`. This links the green to its number and gives the app the line of play.
+4. Optionally trace tees (`golf=tee`), fairways (`golf=fairway`), bunkers (`golf=bunker`), and water (`natural=water`).
+5. Save, wait a few minutes for Overpass to catch up, and build again.
+
+The report also flags numbers that look wrong: a green depth outside 8 to 60 yards, a tiny green, or a length that does not fit the par. Check those against the scorecard.
+
+Exit code 0 means every hole is ready, 3 means the file was written but some holes are not.
 
 ---
 

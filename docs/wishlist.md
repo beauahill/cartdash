@@ -8,7 +8,7 @@ Beyond front, center, and back yardage (Track G):
 - Tap anywhere on the hole to get the distance from the cart to that spot and from that spot to the green (layup distance).
 - Carry distances to bunkers and water on the current hole.
 - Today's pin position, tapped on the green, used in place of the center.
-- Satellite imagery under the hole drawing. Needs an imagery source whose terms allow storing it offline; USGS NAIP aerial imagery is public domain in the US but only about 0.6 m per pixel.
+- Sharper aerial photos than USGS NAIP, if the photo view looks too soft. Needs a commercial source that allows offline storage.
 - Elevation adjusted "plays like" yardage.
 
 ## Charge state in Home Assistant while parked

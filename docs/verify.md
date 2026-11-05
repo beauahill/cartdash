@@ -25,7 +25,12 @@ Status: `open`, `partial`, or `done`.
 
 | Item | How to check | Status | Record in |
 |---|---|---|---|
-| Courses you play are on OpenStreetMap with greens and hole numbers | `tools/course_from_osm.py` report | open | `docs/plan.md` (G1) |
+| Bell Nob is on OpenStreetMap with greens and hole numbers | `tools/course_from_osm.py` report | open | `courses/README.md` |
+| Gillette Golf Club, same | Same | open | `courses/README.md` |
+| Casper Country Club, same | Same | open | `courses/README.md` |
+| Newcastle Golf Course, same | Same | open | `courses/README.md` |
+| Green outlines line up with the real greens | Stand on a green edge, compare to the drawn view | open | this file |
+| USGS aerial photos are sharp enough for the photo view | Look at each course in the photo view | open | this file |
 | Time to first fix after key on | Key on, time until accuracy is under 10 yards | open | this file |
 | Yardage accuracy in open sky | Park at about 20 sprinkler heads or 150 markers, compare to their yardage | open | this file |
 | Yardage accuracy under trees | Same, on tree lined holes | open | this file |
