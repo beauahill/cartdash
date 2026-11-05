@@ -1,0 +1,37 @@
+# Secrets (WiFi, MQTT, BMS PIN). Copy secrets.example.h to secrets.h.
+firmware/include/secrets.h
+
+# PlatformIO
+.pio/
+firmware/.pio/
+firmware/.vscode/
+
+# Android and Gradle
+.gradle/
+android/.gradle/
+android/build/
+android/app/build/
+android/local.properties
+android/.idea/
+android/captures/
+*.iml
+*.apk
+*.aab
+*.jks
+*.keystore
+
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+venv/
+
+# Analyzer output (regenerate from the captures)
+captures/**/plots/
+
+# Editors and OS
+.idea/
+.vscode/
+.DS_Store
+*.swp
