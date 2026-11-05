@@ -18,6 +18,18 @@ Status: `open`, `partial`, or `done`.
 | CarPlay app package name | `adb shell pm list packages` | open | this file |
 | Own "default desktop" setting | Head unit settings | open | this file |
 | USB host sees the ESP32 with VBUS cut | Bench test with the cut cable | open | `docs/pinout.md` |
+| Has a GPS receiver and an external antenna | Box contents, GPS test app | open | this file |
+| Google Play services present (not required, the app uses `LocationManager`) | Settings, apps | open | this file |
+
+## Course GPS
+
+| Item | How to check | Status | Record in |
+|---|---|---|---|
+| Courses you play are on OpenStreetMap with greens and hole numbers | `tools/course_from_osm.py` report | open | `docs/plan.md` (G1) |
+| Time to first fix after key on | Key on, time until accuracy is under 10 yards | open | this file |
+| Yardage accuracy in open sky | Park at about 20 sprinkler heads or 150 markers, compare to their yardage | open | this file |
+| Yardage accuracy under trees | Same, on tree lined holes | open | this file |
+| Whether the ESP32 GNSS upgrade is needed | Decide from the two accuracy checks | open | `docs/plan.md` (G3) |
 
 ## Factory connectors and signals (meter, back-probing)
 

@@ -12,6 +12,7 @@ The brief is `README.md`. This file tracks the order of work, status, and decisi
 | 2026-11-05 | Factory CAN captures run on a Linux laptop with SocketCAN, so listen-only mode is enforced by the kernel driver. |
 | 2026-11-05 | Raw CAN captures are committed under `captures/` as gzip files. The factory bus captures cannot be redone after the swap, so git is their backup. |
 | 2026-11-05 | The USB protocol has one written spec (`docs/usb_protocol.md`), a JSON schema, and sample lines in `protocol/`. The tools, the firmware tests, and the app tests all check against the same samples. |
+| 2026-11-05 | Course maps with front, center, and back yardage are a primary feature (Track G). It is app only: GPS from the head unit's receiver, course data from OpenStreetMap stored on the head unit, holes drawn as vector shapes. A dual band GNSS module on the ESP32 is the upgrade path if head unit GPS is not accurate enough. |
 
 ## Hardware status
 
@@ -29,7 +30,7 @@ Cloud sessions cannot reach the PlatformIO registry, GitHub downloads, or `dl.go
 1. Run a Claude Code session on the laptop (Claude desktop app, or `claude remote-control` in a terminal inside the repo).
 2. Or allow these hosts in the cloud environment's network settings: `dl.google.com`, `api.registry.platformio.org`, `dl.registry.platformio.org`, `github.com`, `objects.githubusercontent.com`.
 
-The Python tools need only PyPI, which already works.
+The Python tools need only PyPI, which already works. Building course files needs the OpenStreetMap Overpass API (`overpass-api.de`), which cloud sessions also cannot reach, so run `tools/course_from_osm.py` on the laptop or allow that host too.
 
 ## Order of work
 
@@ -101,8 +102,37 @@ Done when the emulator shows the dash on fake data and the ESP32 streams simulat
 - MQTT discovery, retained state, availability topic, 1 Hz while ACC is on and home WiFi is connected. Final publish before sleep.
 - Needs no cart hardware, so it can be built against simulated data whenever convenient.
 
+### Track G: Course GPS (app only, alongside the hardware phases)
+
+Starts once the Phase 0 app exists. Nothing here needs cart hardware until G3.
+
+G1, course data:
+- [ ] List the courses you play.
+- [ ] `tools/course_from_osm.py`: query OpenStreetMap for a course, write `courses/<name>.geojson`, and report each hole as complete or missing its green outline, number, tee, or line of play.
+- [ ] Fix gaps by tracing in the OpenStreetMap editor (iD), whose satellite layers are licensed for tracing. Downloading those satellite images for display in the app is not allowed, which is one reason holes are drawn as vector shapes.
+- [ ] Course file format documented in `docs/course_format.md`: GeoJSON features tagged with hole number and kind (green, tee, hole line, fairway, bunker, water, course boundary, and optional fixed front, center, back points).
+
+G2, yardage engine and course screen (emulator):
+- `Yardage.kt`, pure Kotlin with unit tests:
+  - Local flat projection around each green (error is negligible at golf distances). Meters to yards is times 1.09361.
+  - Center is the middle of the green outline.
+  - Front and back are where the line from the cart through the center crosses the green edge, nearest and farthest. Fixed points in the course file win.
+  - Current hole: nearest hole line, plus moving on once the cart leaves a green toward the next tee. Manual previous and next always override.
+  - Smoothing, plus averaging every fix while the ESP32 reports speed 0, so numbers hold still when parked by the ball.
+  - Accuracy gate: dim the numbers and show the accuracy when it is worse than about 10 yards.
+- `LocationSource` with `ReplayLocation`: replays GPX tracks, or drives a simulated round along each hole's line of play, so the emulator shows real course data moving.
+- `CourseScreen`: hole drawn tee at the bottom and green at the top, cart dot, huge front, center, back numbers, hole and par, previous and next buttons, a compact strip with speed, SOC, blinkers, and warnings. Readable in sun: thick shapes, high contrast colors, no thin lines.
+- The course screen appears automatically inside a course boundary. The overlay shows center yardage over CarPlay.
+
+G3, on the real head unit:
+- [ ] Confirm the head unit has GPS and where its antenna goes (under the roof, clear sky view; the plastic roof does not block GPS).
+- [ ] Time to first fix after key on (the unit sleeps, so it should be a warm start).
+- [ ] Accuracy: park at about 20 sprinkler heads or 150 yard markers with known yardage to center and record the error in `docs/verify.md`. Typical head unit GPS is within 3 to 5 yards in open sky; trees make it worse.
+- [ ] If it is not good enough: add a dual band (L1 and L5) GNSS module to the ESP32 on a spare UART, send `lat`, `lon`, and `gps_acc_m` as new optional `state` fields (no protocol version change), and add an `EspGnss` location source.
+
 ### Phase 6: Android polish
 - Overlay: a Compose view in an overlay window needs its lifecycle and saved state owners set by hand. Confirm on the real unit that it draws over the CarPlay app.
+- Speed calibration: with GPS available, the app can compare GPS speed to the reported speed on a straight run and suggest the tire diameter or gear ratio.
 - CarPlay app picker: Android 11 and later need a `<queries>` entry for launcher intents, or the app list comes back nearly empty.
 - Trips are computed in `LinkService`, not the UI. Skip gaps longer than 1 s. Save about every 10 s. Range estimate is SOC times about 8.3 kWh divided by recent Wh per mile.
 - Test day and night themes outside in direct sun. A light background often reads better on a glossy screen than a dark one.

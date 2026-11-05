@@ -2,6 +2,15 @@
 
 Ideas that are out of scope for the current phases. Move an item into `docs/plan.md` when it is picked up.
 
+## Course GPS extras
+
+Beyond front, center, and back yardage (Track G):
+- Tap anywhere on the hole to get the distance from the cart to that spot and from that spot to the green (layup distance).
+- Carry distances to bunkers and water on the current hole.
+- Today's pin position, tapped on the green, used in place of the center.
+- Satellite imagery under the hole drawing. Needs an imagery source whose terms allow storing it offline; USGS NAIP aerial imagery is public domain in the US but only about 0.6 m per pixel.
+- Elevation adjusted "plays like" yardage.
+
 ## Charge state in Home Assistant while parked
 
 Report SOC and charging status to Home Assistant with the key off, for example while plugged in at home.

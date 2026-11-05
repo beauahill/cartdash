@@ -1,6 +1,6 @@
 # Cart Dash: ESP32 data hub + native Android dashboard
 
-Custom dashboard for a Sdlool GC22S electric golf cart. An always-on ESP32 reads every cart signal (motor controller, BMS, lights, brakes, speed) and streams it over USB serial to an Android head unit in the dash. A native Kotlin app on the head unit runs as the home launcher and draws the dashboard, alongside CarPlay. The ESP32 also publishes to Home Assistant over MQTT when the cart is in range of home WiFi.
+Custom dashboard for a Sdlool GC22S electric golf cart. An always-on ESP32 reads every cart signal (motor controller, BMS, lights, brakes, speed) and streams it over USB serial to an Android head unit in the dash. A native Kotlin app on the head unit runs as the home launcher and draws the dashboard, alongside CarPlay. On the golf course the same app shows a map of the current hole and GPS yardage to the front, center, and back of the green. The ESP32 also publishes to Home Assistant over MQTT when the cart is in range of home WiFi.
 
 This file is the project brief. Read it fully before writing code. Facts marked **VERIFY** came from a generic manufacturer manual or seller listing and must be confirmed on the real hardware before code depends on them.
 
@@ -11,6 +11,7 @@ This file is the project brief. Read it fully before writing code. Facts marked 
 3. Boot straight into the dashboard. No kiosk apps, no browser, no manual steps after key on.
 4. Publish data to Home Assistant over MQTT whenever the cart is home (mainly charge state and SOC).
 5. Be buildable in phases. Both the firmware and the app must run on simulated data before any cart hardware is connected.
+6. On a golf course, show the current hole and yardage from the cart to the front, center, and back of the green, using GPS and course data stored on the head unit. This is a primary feature, and like the rest of the dash it works with no internet.
 
 ## Architecture
 
@@ -19,13 +20,15 @@ This file is the project brief. Read it fully before writing code. Facts marked 
  BMS (Bluetooth LE) ──────────────────────────┤
  Factory 12V signals ──(PC817 optos)──────────┼──> ESP32-S3 ──USB serial──> Android head unit
  Speed pulse ──(fast opto)────────────────────┘        │                  (Kotlin launcher app)
+                                                       │                           ▲
+                                                       │      Head unit GPS ───────┘ (course yardage)
                                                        └──WiFi STA──> MQTT ──> Home Assistant
 ```
 
 Split of responsibilities:
 
 - **ESP32 firmware**: owns all hardware. Reads, decodes, timestamps, and streams cart state. Knows nothing about the UI.
-- **Android app**: owns all presentation and user features. Dashboard, trip data, settings, CarPlay launching, screen dimming, overlay. Treats the ESP32 as a data source behind an interface.
+- **Android app**: owns all presentation and user features. Dashboard, course map and yardage, trip data, settings, CarPlay launching, screen dimming, overlay. Treats the ESP32 as a data source behind an interface, and reads GPS from the head unit's own receiver behind a second interface.
 - **MQTT**: ESP32 only, best effort, never blocks anything else.
 
 USB is the primary link because wireless CarPlay uses the head unit's WiFi radio. Do not design anything that needs the head unit on WiFi.
@@ -40,7 +43,7 @@ USB is the primary link because wireless CarPlay uses the head unit's WiFi radio
 | PC817 opto isolators | One per 12V digital input |
 | 6N137 fast opto | Speed pulse input |
 | 12V to 5V buck, small | Powers ESP32 from constant 12V |
-| Head unit: Topway TS10s, 10", 2K QLED, 8GB/128GB, Android 12, UIS7862S | **VERIFY** chip, RAM, Android version, and screen resolution with CPU-Z on arrival. Includes RCA outs, reverse camera input, 2 USB cables. |
+| Head unit: Topway TS10s, 10", 2K QLED, 8GB/128GB, Android 12, UIS7862S | **VERIFY** chip, RAM, Android version, and screen resolution with CPU-Z on arrival. Includes RCA outs, reverse camera input, 2 USB cables. **VERIFY** it has a built-in GPS receiver with an external antenna. |
 
 ## Electrical rules (do not violate)
 
@@ -157,13 +160,24 @@ android/                      Gradle project, Kotlin, Jetpack Compose
         LinkService.kt        foreground service holding the connection
       ui/
         DashScreen.kt
+        CourseScreen.kt       hole map and front, center, back yardage
         SettingsScreen.kt
         Overlay.kt            mini bar shown over CarPlay
         theme/                day and night themes
+      location/
+        LocationSource.kt     interface: Flow<Fix> with accuracy
+        HeadUnitGps.kt        Android LocationManager, no Google Play dependency
+        ReplayLocation.kt     GPX replay and simulated rounds for the emulator
+      course/
+        Course.kt             course, hole, green, hazard model
+        CourseStore.kt        loads course files from local storage
+        Yardage.kt            hole detection, front/center/back, smoothing (pure Kotlin)
       trips/                  trip odometer and energy, Room or DataStore
     res/xml/usb_device_filter.xml
+courses/                      course files (GeoJSON), one per course
 tools/
   fake_esp.py                 emits the same JSON over TCP or a virtual serial port
+  course_from_osm.py          builds a course file from OpenStreetMap and reports gaps
   can_capture.py              labeled, listen-only CAN captures with keyboard markers
   can_log_analyze.py          finds changing bytes in raw CAN logs, aligned to markers
 docs/
@@ -182,9 +196,21 @@ docs/
 - Dashboard layout: landscape, built in dp so it scales to the real resolution (2K, about 2000x1200, **VERIFY**), touch, no scrolling on the main view. Very large speed and SOC numerals, high contrast, no thin fonts. Big blinker arrows. Banners for regen warning, BMS faults, Kelly faults, and link lost.
 - Night theme follows the `illum` signal with a manual override. Screen brightness can be lowered at the window level inside the app. System wide brightness needs WRITE_SETTINGS, which is optional.
 - CarPlay button launches the head unit's CarPlay app. The package name differs by firmware, so it is a setting with a picker that lists installed apps.
-- Overlay: optional small strip (speed, SOC, blinkers) drawn over other apps using SYSTEM_ALERT_WINDOW, so it shows on top of CarPlay.
+- Overlay: optional small strip (speed, SOC, blinkers, and center yardage while on a course) drawn over other apps using SYSTEM_ALERT_WINDOW, so it shows on top of CarPlay.
 - Trips: odometer, energy used (Wh), Wh per mile, and a simple range estimate, stored locally and resettable.
-- Settings: data source, CarPlay package, wheel diameter, gear ratio, speed source, theme override, overlay on or off.
+- Settings: data source, CarPlay package, wheel diameter, gear ratio, speed source, theme override, overlay on or off, location source, installed courses.
+
+## Course GPS requirements
+
+- **Position** comes from the head unit's GPS through `LocationSource`, using Android `LocationManager` directly so nothing depends on Google Play services. Mount the GPS antenna under the cart roof with a clear view of the sky, not in the dash. If the head unit is not accurate enough on the course (**VERIFY**), the upgrade path is a dual band GNSS module on the ESP32 that sends its position over USB as extra `state` fields.
+- **Course data** lives on the head unit as one GeoJSON file per course, so yardage works with no internet. Each hole needs at least a green outline and a hole number. A tee and the hole's line of play (tee to green) improve hole detection and the map. Fairways, bunkers, and water are drawn when present.
+- **Where course data comes from**: OpenStreetMap, which maps golf courses with `golf=hole`, `golf=green`, `golf=tee`, `golf=fairway`, `golf=bunker`, and water tags. `tools/course_from_osm.py` builds a course file on a laptop and reports which holes are missing a green or a number. Fix gaps by tracing in the OpenStreetMap editor (its satellite layers are licensed for tracing), then build the file again. Load courses onto the head unit by USB drive or ADB. The course screen shows "© OpenStreetMap contributors".
+- **Yardage**: center is the middle of the green outline. Front and back are where the line from the cart through the green center crosses the edge of the green, nearest and farthest, so they stay right when approaching from an angle. If a course file gives fixed front, center, or back points, those win. Show whole yards of horizontal distance.
+- **Steady numbers**: smooth the position. While the ESP32 reports the cart stopped, average every fix since it stopped. When GPS accuracy is worse than about 10 yards, dim the numbers and show the accuracy.
+- **Current hole**: chosen automatically from position, with large previous and next buttons to override.
+- **Course screen**: landscape, touch, no scrolling. The hole is drawn as vector shapes, rotated so the tee is at the bottom and the green at the top, with the cart as a dot. Front, center, and back yardage are the largest numbers on the screen, with hole number and par. A compact strip keeps speed, SOC, blinkers, and warning banners visible.
+- **Switching**: the course screen shows automatically while the cart is inside a known course boundary, and the drive dash otherwise, with a manual toggle.
+- Yardage math is pure Kotlin with unit tests. On the course, check it against sprinkler head and 150 yard marker distances.
 
 ## ESP32 firmware requirements
 
@@ -247,6 +273,8 @@ Do these in order. Each phase ends with something that runs.
 
 **Phase 6: Android polish.** CarPlay button, overlay, night theme, trips, settings screen, calibration.
 
+**Track G: Course GPS.** App only, so it runs alongside the hardware phases once the Phase 0 app exists. G1: check OpenStreetMap coverage of the courses you play, fill gaps, build course files. G2: yardage engine and course screen, developed on replayed GPS in the emulator. G3: on the real head unit, measure GPS accuracy against known markers on the course and decide whether the ESP32 GNSS upgrade is needed.
+
 ## Head unit setup (manual, not code)
 
 1. On arrival, install CPU-Z and confirm UIS7862S, 8GB RAM, Android version, and screen resolution. Dispute right away if it does not match.
@@ -254,6 +282,8 @@ Do these in order. Each phase ends with something that runs.
 3. Set Cart Dash as the default home app. Some TS10 firmware has its own "default desktop" setting that also needs changing.
 4. In the head unit's app management or battery settings, exempt Cart Dash from any background killing or "clean on sleep" feature.
 5. Grant overlay permission if the overlay is used.
+6. Grant Cart Dash location permission. Mount the GPS antenna under the cart roof with a clear view of the sky.
+7. Copy course files to the head unit.
 
 ## Writing rules
 
