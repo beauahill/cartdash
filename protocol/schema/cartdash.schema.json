@@ -1,0 +1,100 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/beauahill/cartdash/protocol/schema/cartdash.schema.json",
+  "title": "Cart Dash USB link message",
+  "description": "One line of the USB link, protocol version 1. See docs/usb_protocol.md. Unknown message types and unknown fields are allowed and ignored by receivers.",
+  "type": "object",
+  "required": ["type"],
+  "properties": {
+    "type": { "type": "string" }
+  },
+  "allOf": [
+    { "if": { "properties": { "type": { "const": "state" } } }, "then": { "$ref": "#/$defs/state" } },
+    { "if": { "properties": { "type": { "const": "hello" } } }, "then": { "$ref": "#/$defs/hello" } },
+    { "if": { "properties": { "type": { "const": "log" } } }, "then": { "$ref": "#/$defs/log" } },
+    { "if": { "properties": { "type": { "const": "cmd" } } }, "then": { "$ref": "#/$defs/cmd" } }
+  ],
+  "$defs": {
+    "u32": { "type": "integer", "minimum": 0, "maximum": 4294967295 },
+    "num": { "type": ["number", "null"] },
+    "flag": { "type": ["boolean", "null"] },
+    "codes": { "type": ["array", "null"], "items": { "type": "string" } },
+    "state": {
+      "type": "object",
+      "required": ["type", "seq", "t"],
+      "properties": {
+        "seq": { "$ref": "#/$defs/u32" },
+        "t": { "$ref": "#/$defs/u32" },
+        "speed_mph": { "type": ["number", "null"], "minimum": 0 },
+        "gear": { "enum": ["D", "N", "R", null] },
+        "speed_mode": { "type": ["string", "null"] },
+        "soc_pct": { "type": ["number", "null"], "minimum": 0, "maximum": 100 },
+        "pack_v": { "$ref": "#/$defs/num" },
+        "pack_a": { "$ref": "#/$defs/num" },
+        "power_kw": { "$ref": "#/$defs/num" },
+        "cell_v_min": { "$ref": "#/$defs/num" },
+        "cell_v_max": { "$ref": "#/$defs/num" },
+        "bms_temp_f": { "type": ["array", "null"], "items": { "type": "number" } },
+        "ctrl_temp_f": { "$ref": "#/$defs/num" },
+        "motor_temp_f": { "$ref": "#/$defs/num" },
+        "motor_rpm": { "$ref": "#/$defs/num" },
+        "turn_left": { "$ref": "#/$defs/flag" },
+        "turn_right": { "$ref": "#/$defs/flag" },
+        "low_beam": { "$ref": "#/$defs/flag" },
+        "high_beam": { "$ref": "#/$defs/flag" },
+        "brake": { "$ref": "#/$defs/flag" },
+        "park_brake": { "$ref": "#/$defs/flag" },
+        "reverse": { "$ref": "#/$defs/flag" },
+        "illum": { "$ref": "#/$defs/flag" },
+        "kelly_faults": { "$ref": "#/$defs/codes" },
+        "bms_faults": { "$ref": "#/$defs/codes" },
+        "stale": { "type": "array", "items": { "type": "string" }, "uniqueItems": true }
+      }
+    },
+    "hello": {
+      "type": "object",
+      "required": ["type", "proto", "fw", "uptime_s"],
+      "properties": {
+        "proto": { "type": "integer", "minimum": 1 },
+        "fw": { "type": "string" },
+        "uptime_s": { "$ref": "#/$defs/u32" },
+        "sim": { "type": "boolean" }
+      }
+    },
+    "log": {
+      "type": "object",
+      "required": ["type"],
+      "anyOf": [{ "required": ["msg"] }, { "required": ["frame"] }],
+      "properties": {
+        "lvl": { "enum": ["debug", "info", "warn", "error"] },
+        "tag": { "type": "string" },
+        "msg": { "type": "string" },
+        "t": { "$ref": "#/$defs/u32" },
+        "frame": { "type": "string", "pattern": "^([0-9A-F]{3}|[0-9A-F]{8})#([0-9A-F]{2}){0,8}$" }
+      }
+    },
+    "cmd": {
+      "type": "object",
+      "required": ["type", "cmd"],
+      "properties": {
+        "cmd": { "type": "string" }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "cmd": { "const": "set_config" } } },
+          "then": {
+            "required": ["key", "value"],
+            "properties": {
+              "key": { "type": "string" },
+              "value": { "type": ["number", "string", "boolean"] }
+            }
+          }
+        },
+        {
+          "if": { "properties": { "cmd": { "const": "can_log" } } },
+          "then": { "required": ["on"], "properties": { "on": { "type": "boolean" } } }
+        }
+      ]
+    }
+  }
+}

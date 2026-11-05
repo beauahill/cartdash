@@ -1,0 +1,4 @@
+{"type":"cmd","cmd":"set_config","key":"wheel_dia_in","value":22.0}
+{"type":"cmd","cmd":"set_config","key":"speed_src","value":"rpm"}
+{"type":"cmd","cmd":"set_config","key":"sim","value":true}
+{"type":"cmd","cmd":"can_log","on":true}

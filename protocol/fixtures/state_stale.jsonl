@@ -1,0 +1,1 @@
+{"type":"state","seq":77,"t":9100,"speed_mph":0.0,"gear":"N","soc_pct":64,"pack_v":65.9,"pack_a":-1.8,"power_kw":-0.12,"ctrl_temp_f":null,"motor_temp_f":98,"motor_rpm":0,"bms_faults":["cell_uv"],"stale":["soc_pct","pack_v","pack_a","power_kw","motor_temp_f"]}

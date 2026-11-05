@@ -1,0 +1,4 @@
+{"type":"log","lvl":"info","tag":"sys","msg":"boot, fw 0.1.0","t":12}
+{"type":"log","lvl":"warn","tag":"ble","msg":"BMS disconnected, retrying"}
+{"type":"log","lvl":"debug","tag":"can","t":1234567,"frame":"18FF50E5#0102030405060708"}
+{"type":"log","lvl":"debug","tag":"can","t":1234568,"frame":"123#"}
