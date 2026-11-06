@@ -197,6 +197,7 @@ def test_course_file_round_trip(tmp_path):
     assert sorted(back.holes) == [1, 2, 3]
     assert back.holes[1].par == 4 and len(back.holes[1].tees) == 2
     assert back.holes[1].line == course.holes[1].line
+    assert back.holes[1].osm == {"hole": course.holes[1].osm["hole"], "green": course.holes[1].osm["green"]}
     a = cl.green_yardage(ORIGIN, course.holes[1].green)
     b = cl.green_yardage(ORIGIN, back.holes[1].green)
     assert (a.front, a.center, a.back) == pytest.approx((b.front, b.center, b.back))

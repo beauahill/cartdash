@@ -33,8 +33,8 @@ Status: `open`, `partial`, or `done`.
 | USGS aerial photos are sharp enough for the photo view | Look at each course in the photo view | open | this file |
 | Gillette Golf Club: 9 or 18 holes? | Owner | done: 9 holes, the eastern expansion was abandoned | `courses/gillette-golf-club.overrides.json` |
 | Bell Nob short course: wanted in the app? | Owner | done: yes | `courses/bell-nob-golf-course.overrides.json` |
-| Bell Nob short course: hole numbers and name | Owner, against the routing preview | open | `courses/bell-nob-golf-course.overrides.json` (`numbering`, `name`) |
-| Bell Nob short course: all par 3? | Owner or its scorecard | open | same file |
+| Bell Nob short course: hole numbers and name | Owner, against the routing preview | done: order as inferred, starting from the inferred hole 5; name Bell Nob Short Course | `courses/bell-nob-golf-course.overrides.json` (`numbering`, `name`) |
+| Bell Nob short course: all par 3? | Owner | done: yes | same file |
 | Pars for Bell Nob, Gillette Golf Club, Casper | Scorecards | done | `courses/<course>.overrides.json` |
 | Bell Nob hole 1 tees south of the clubhouse | Owner | done: correct, the front 9 is south of the clubhouse | `courses/README.md` |
 | Time to first fix after key on | Key on, time until accuracy is under 10 yards | open | this file |

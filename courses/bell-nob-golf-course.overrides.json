@@ -167,7 +167,7 @@
  "short_course": {
   "name": "Bell Nob Short Course",
   "scorecard": {
-   "source": "assumed par 3 on every hole (holes are 72 to 214 yd); not from a scorecard",
+   "source": "par 3 on every hole, confirmed by the owner on 2026-11-06",
    "par": [
     3,
     3,
@@ -179,6 +179,18 @@
     3,
     3
    ]
-  }
+  },
+  "numbering": {
+   "way/1491799753": 1,
+   "way/1491799874": 2,
+   "way/1491799776": 3,
+   "way/1491799855": 4,
+   "way/1491799791": 5,
+   "way/1491799826": 6,
+   "way/1491799885": 7,
+   "way/1491799882": 8,
+   "way/1491799854": 9
+  },
+  "numbering_source": "confirmed by the owner on 2026-11-06: the inferred order was right, starting from the inferred hole 5"
  }
 }

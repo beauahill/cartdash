@@ -5,7 +5,7 @@ One course file per course, in the format described in `docs/course_format.md`, 
 | Course | Town | Course file | Holes ready | Scorecard | Photo | Notes |
 |---|---|---|---|---|---|---|
 | Bell Nob Golf Course | Gillette | `bell-nob-golf-course.geojson` | 18 of 18 | pars, handicaps, 6 tees | yes | Front 9 south of the clubhouse, back 9 north into the neighborhood. Mapped lengths match the Black tees within 3%, except hole 10 (+28 yd). |
-| Bell Nob Short Course | Gillette | `bell-nob-short-course.geojson` | 9 of 9 | par 3 assumed | yes | Built from 9 unnumbered holes inside Bell Nob's boundary. **Hole numbers are inferred from the routing; confirm them.** Name is a placeholder. |
+| Bell Nob Short Course | Gillette | `bell-nob-short-course.geojson` | 9 of 9 | par 3 on every hole, 1,133 yd | yes | Built from 9 unnumbered holes inside Bell Nob's boundary. Hole order, numbers, and pars confirmed by the owner. |
 | Gillette Golf Club | Gillette | `gillette-golf-club.geojson` | 9 of 9 | pars, handicaps, Yellow tees | yes | 9 holes. An eastern expansion was abandoned; its features are excluded in the overrides file. |
 | Casper Country Club | Casper | `casper-country-club.geojson` | 18 of 18 | pars, handicaps, Blue tees | yes | |
 | Newcastle Country Club | Newcastle | `newcastle-country-club.geojson` | 9 of 9 | pars from OpenStreetMap | yes | |

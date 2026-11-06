@@ -410,6 +410,8 @@ def from_geojson(data: dict) -> Course:
             continue
         if isinstance(n, int) and kind in HOLE_KINDS:
             h = course.holes.setdefault(n, Hole(n))
+            if props.get("osm") and kind in ("hole", "green"):
+                h.osm[kind] = props["osm"]
             if kind == "hole":
                 h.par = props.get("par", h.par)
                 h.handicap = props.get("handicap", h.handicap)

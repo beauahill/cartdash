@@ -114,11 +114,11 @@ G1, course data:
 - [x] Course file format: `docs/course_format.md`. Yardage reference: `tools/courselib.py`.
 - [x] Build and check each course (`courses/README.md` tracks them). All 54 mapped holes are ready for yardage:
   - [x] Bell Nob, Gillette: 18 of 18. Mapped lengths match the scorecard's Black tees within 3%, except hole 10.
-  - [x] Bell Nob Short Course: 9 of 9, built from the unnumbered holes inside Bell Nob's boundary. Numbering inferred from the routing; waiting on confirmation.
+  - [x] Bell Nob Short Course: 9 of 9, all par 3, built from the unnumbered holes inside Bell Nob's boundary. The inferred routing was right but started at the wrong hole; numbering confirmed by the owner and recorded in the overrides file.
   - [x] Gillette Golf Club, Gillette: 9 of 9. Its abandoned eastern expansion is excluded in the overrides file.
   - [x] Casper Country Club, Casper: 18 of 18.
   - [x] Newcastle Country Club, Newcastle: 9 of 9.
-- [x] Scorecards: pars, handicaps, and tee yardages for Bell Nob, Casper, and Gillette Golf Club in `courses/<course>.overrides.json`. Newcastle's pars come from OpenStreetMap. The short course is assumed par 3 throughout.
+- [x] Scorecards: pars, handicaps, and tee yardages for Bell Nob, Casper, and Gillette Golf Club in `courses/<course>.overrides.json`. Newcastle's pars come from OpenStreetMap. The short course is par 3 throughout.
 - [x] `tools/course_preview.py` draws a course and each hole as PNGs, on the drawn shapes or the photo, to check data by eye.
 - [ ] Fix gaps by tracing in the OpenStreetMap editor (iD), whose satellite layers are licensed for tracing. Those satellite images cannot be downloaded for the app, which is why the photo view uses USGS imagery.
 - [x] `tools/course_imagery.py`: one JPEG per course from the USGS NAIP image service, cut to the course boundary plus 40 m, with a sidecar giving its bounds (`docs/course_format.md`). The USGS basemap tiles stop at zoom 16 (about 1.7 m per pixel here), too coarse, so it uses the NAIP export service at 0.5 m per pixel instead. That service grows any asked area until its pixels are square in degrees, which squashed the first photos by up to 100 m; the tool now asks for square degree pixels, reads back the extent the service really returned, and resamples onto the grid. A test with dots at known spots near chunk edges guards it. A green 25 to 30 m across is about 50 pixels: fine as a background, soft up close. Mapped green outlines line up with the greens in the photos. NAIP is flown every two to three years, so new construction can be missing (Gillette Golf Club's east side). If NAIP looks too soft, sharper commercial imagery needs an account and that vendor's SDK for offline use.
