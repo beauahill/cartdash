@@ -227,3 +227,103 @@ def test_queries():
         osm.parse_ref("123")
     assert osm.slug("Bell Nob Golf Course") == "bell-nob-golf-course"
     assert osm._regex_escape("St. Mary's (East)") == "St\\. Mary's \\(East\\)"
+
+
+# Overrides: scorecard, exclusions, and a short course of unnumbered holes -------------------
+
+
+def short_course_elements():
+    """Four unnumbered holes in a loop, given out of order: S3, S1, S4, S2."""
+    holes = {
+        "S1": ((120, 420), (120, 520)),
+        "S2": ((140, 540), (240, 540)),
+        "S3": ((250, 520), (250, 420)),
+        "S4": ((230, 400), (140, 400)),
+    }
+    els, lines = [], {}
+    for name in ("S3", "S1", "S4", "S2"):
+        (tx, ty), (gx, gy) = holes[name]
+        line = way([ll(tx, ty), ll(gx, gy)], golf="hole")
+        lines[name] = osm.ref_of(line)
+        els += [line, way(circle(gx, gy + (5 if name == "S1" else 0), 8), golf="green"), way(rect(tx - 4, ty - 4, tx + 4, ty + 4), golf="tee")]
+    return els, lines
+
+
+CARD = {"source": "test card", "par": [5, 3, 3, 4, 4, 4, 4, 4, 4], "handicap": [1, 2, 3, 4, 5, 6, 7, 8, 9],
+        "tees": {"Blue": [380, 150, 170, 400, 410, 420, 430, 440, 450], "Red": [320, 120, 140, 350, 360, 370, 380, 390, 400]}}
+
+
+def test_scorecard_and_exclusions():
+    els = synthetic_download()
+    unlinked = next(e for e in els if (e.get("tags") or {}).get("golf") == "green" and "ref" not in e["tags"]
+                    and cl.contains(osm.outer_ring(osm.element_geometry(e)), ll(150, 500)))
+    course, notes = osm.build_course(els, overrides={"scorecard": CARD, "exclude": [osm.ref_of(unlinked)]})
+    h1 = course.holes[1]
+    assert h1.par == 5 and h1.handicap == 1 and h1.yards == {"Blue": 380, "Red": 320}
+    assert course.tees == ["Blue", "Red"] and course.scorecard == "test card"
+    assert any("OpenStreetMap says par 4, the scorecard says 5" in w for w in notes.warnings)
+    assert any("scorecard has hole 4 but the map does not" in w for w in notes.warnings)
+    assert notes.excluded == 1 and notes.unlinked_greens == []
+    assert "green" not in {f.kind for f in course.features}
+    lines, _ = osm.coverage_report(course, notes)
+    text = "\n".join(lines)
+    assert "Card yd (Blue)" in text and "| 380 |" in text and "Left out 1 features" in text
+
+
+def test_bad_scorecards_are_refused():
+    with pytest.raises(SystemExit):
+        osm.build_course(synthetic_download(), overrides={"scorecard": {"par": [4, 4], "handicap": [1]}})
+    with pytest.raises(SystemExit):
+        osm.build_course(synthetic_download(), overrides={"scorecard": {"handicap": [1, 1, 2]}})
+
+
+def test_infer_order_finds_the_loop():
+    starts_ends = [((250, 520), (250, 420)), ((120, 420), (120, 520)), ((230, 400), (140, 400)), ((140, 540), (240, 540))]
+    lines = [[ll(*a), ll(*b)] for a, b in starts_ends]
+    assert osm.infer_order(lines, start_near=ll(0, 0)) == [1, 3, 0, 2]  # S1, S2, S3, S4
+    assert sorted(osm.infer_order(lines)) == [0, 1, 2, 3]
+
+
+def test_short_course_from_unnumbered_holes(tmp_path):
+    extra, lines = short_course_elements()
+    els = synthetic_download() + extra
+    plain, plain_notes = osm.build_course(els)
+    assert sum("hole line has no ref" in w for w in plain_notes.warnings) == 4  # without overrides they are skipped
+
+    spec = {"name": "Test Links Short Course", "scorecard": {"par": [3, 3, 3, 3]}}
+    course, notes = osm.build_course(els, overrides={"short_course": spec})
+    (short, snotes), = notes.extra_courses
+    assert short.name == "Test Links Short Course" and sorted(short.holes) == [1, 2, 3, 4]
+    assert [short.holes[n].osm["hole"] for n in (1, 2, 3, 4)] == [lines[k] for k in ("S1", "S2", "S3", "S4")]
+    assert all(h.green is not None and len(h.tees) == 1 and h.par == 3 for h in short.holes.values())
+    assert snotes.numbering_inferred and short.expected_holes == 4
+    assert all(cl.contains(short.boundary, h.green_center()) for h in short.holes.values())
+    # The short course's greens are no longer reported as unlinked on the main course, but stay drawn there.
+    assert len(notes.unlinked_greens) == 1
+    assert sum(1 for f in course.features if f.kind == "green") == 5
+
+    # Recorded numbering wins over the inferred one.
+    numbering = {lines["S4"]: 1, lines["S1"]: 2, lines["S2"]: 3, lines["S3"]: 4}
+    course2, notes2 = osm.build_course(els, overrides={"short_course": dict(spec, numbering=numbering)})
+    short2, snotes2 = notes2.extra_courses[0]
+    assert short2.holes[1].osm["hole"] == lines["S4"] and not snotes2.numbering_inferred
+
+    # The build command writes both course files, finding the overrides file by course name.
+    saved = tmp_path / "osm.json"
+    saved.write_text(json.dumps({"elements": els}))
+    out = tmp_path / "courses"
+    out.mkdir()
+    (out / "test-links.overrides.json").write_text(json.dumps({"short_course": spec}))
+    osm.main(["build", "--osm-json", str(saved), "--out", str(out)])
+    assert (out / "test-links.geojson").exists() and (out / "test-links-short-course.geojson").exists()
+    back = cl.load_course(out / "test-links-short-course.geojson")
+    assert sorted(back.holes) == [1, 2, 3, 4] and back.holes[2].par == 3
+
+
+def test_convex_hull():
+    pts = [ll(0, 0), ll(100, 0), ll(100, 100), ll(0, 100), ll(50, 50)]
+    hull = cl.convex_hull(pts)
+    assert len(hull) == 5 and hull[0] == hull[-1]
+    assert cl.area_m2(hull) == pytest.approx(10000, rel=1e-3)
+    grown = cl.convex_hull(pts, margin_m=10)
+    assert cl.area_m2(grown) > cl.area_m2(hull) and cl.contains(grown, ll(-3, -3))

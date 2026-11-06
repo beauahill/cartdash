@@ -5,7 +5,7 @@ import urllib.parse
 import pytest
 
 PIL = pytest.importorskip("PIL")
-from PIL import Image  # noqa: E402
+from PIL import Image, ImageDraw  # noqa: E402
 
 import course_imagery as ci  # noqa: E402
 import courselib as cl  # noqa: E402
@@ -20,8 +20,7 @@ def ll(x, y):
 
 def square_course(tmp_path, size_m=1500.0):
     c = cl.Course("Square Links")
-    pts = [ll(0, 0), ll(size_m, 0), ll(size_m, size_m), ll(0, size_m), ll(0, 0)]
-    c.boundary = pts
+    c.boundary = [ll(0, 0), ll(size_m, 0), ll(size_m, size_m), ll(0, size_m), ll(0, 0)]
     c.holes[1] = cl.Hole(1, line=[ll(100, 100), ll(100, 400)], green=[ll(90, 400), ll(110, 400), ll(110, 420), ll(90, 420), ll(90, 400)])
     path = tmp_path / "square-links.geojson"
     cl.write_course(c, path)
@@ -29,42 +28,90 @@ def square_course(tmp_path, size_m=1500.0):
 
 
 class FakeService:
-    """Returns a JPEG of the requested size whose color encodes the request's west edge."""
+    """Behaves like the ArcGIS exportImage endpoint, including its habit of growing the
+    asked area until pixels are square in degrees. Renders white dots at known places."""
 
-    def __init__(self, blank=False, broken=False):
-        self.calls = []
+    def __init__(self, dots=(), blank=False, broken=False):
+        self.dots = list(dots)  # (lon, lat)
         self.blank = blank
         self.broken = broken
+        self.json_calls = []
+        self.images = {}
 
     def __call__(self, url, params):
-        self.calls.append(params)
+        if url.startswith("fake://"):
+            return self.images[url]
+        self.json_calls.append(params)
         if self.broken:
             return b'{"error":{"code":500,"message":"Error exporting image"}}'
         w, h = (int(v) for v in params["size"].split(","))
-        color = (120, 120, 120) if self.blank else (40 + len(self.calls) * 20 % 200, 140, 60)
-        img = Image.new("RGB", (w, h), color)
+        west, south, east, north = (float(v) for v in params["bbox"].split(","))
+        px = max((east - west) / w, (north - south) / h)  # square degree pixels, like the real service
+        cx, cy = (west + east) / 2, (south + north) / 2
+        ext = {"xmin": cx - px * w / 2, "xmax": cx + px * w / 2, "ymin": cy - px * h / 2, "ymax": cy + px * h / 2}
+        img = Image.new("RGB", (w, h), (120, 120, 120) if self.blank else (30, 80, 30))
+        d = ImageDraw.Draw(img)
         if not self.blank:
-            img.putpixel((0, 0), (255, 255, 255))  # some contrast so it is not seen as blank
+            d.point((0, 0), fill=(200, 200, 200))
+        for lon, lat in self.dots:
+            x = (lon - ext["xmin"]) / px
+            y = (ext["ymax"] - lat) / px
+            d.ellipse((x - 6, y - 6, x + 6, y + 6), fill=(255, 255, 255))
         buf = io.BytesIO()
-        img.save(buf, "JPEG")
-        return buf.getvalue()
+        img.save(buf, "PNG")
+        href = f"fake://image/{len(self.json_calls)}"
+        self.images[href] = buf.getvalue()
+        return json.dumps({"href": href, "width": w, "height": h, "extent": ext}).encode()
+
+
+def white_centroid(img, box):
+    xs = ys = n = 0
+    x0, y0, x1, y1 = box
+    for y in range(max(0, y0), min(img.height, y1)):
+        for x in range(max(0, x0), min(img.width, x1)):
+            if sum(img.getpixel((x, y))) > 600:
+                xs += x
+                ys += y
+                n += 1
+    return (xs / n, ys / n) if n else None
 
 
 def test_grid_is_pixel_aligned_and_tiles_exactly():
-    pts = [ll(0, 0), ll(1500, 1200)]
-    g = ci.make_grid(pts, mpp=0.5, margin_m=40)
+    g = ci.make_grid([ll(0, 0), ll(1500, 1200)], mpp=0.5, margin_m=40)
     assert g.width == pytest.approx((1500 + 80) / 0.5, abs=2)
     assert g.height == pytest.approx((1200 + 80) / 0.5, abs=2)
     chunks = g.chunks(1000)
     assert sum(w * h for _, _, w, h, _ in chunks) == g.width * g.height
-    # Neighbouring chunks share edges exactly, so the stitched photo has no gaps or overlaps.
     by_pos = {(c, r): bbox for c, r, _, _, bbox in chunks}
     for (c, r), (west, south, east, north) in by_pos.items():
         if (c + 1000, r) in by_pos:
             assert by_pos[(c + 1000, r)][0] == pytest.approx(east, abs=1e-12)
         if (c, r + 1000) in by_pos:
             assert by_pos[(c, r + 1000)][3] == pytest.approx(south, abs=1e-12)
-    assert max(w for _, _, w, _, _ in chunks) <= ci.MAX_REQUEST_PX
+
+
+def test_requests_use_square_degree_pixels_under_the_limit():
+    g = ci.make_grid([ll(0, 0), ll(1500, 1500)], mpp=0.5, margin_m=0)
+    rw, rh = ci.request_size(g, 2000, 2000)
+    assert rh == 2000 and rw > 2000 and rw <= ci.MAX_REQUEST_PX
+    assert (g.dlon * 2000) / rw == pytest.approx(g.dlat, rel=1e-3)
+
+
+@pytest.mark.parametrize("size_m", [700.0, 1500.0])
+def test_photo_lines_up_with_the_ground(tmp_path, size_m):
+    """Dots placed at known spots, including near chunk edges, land on the right pixels."""
+    path = square_course(tmp_path, size_m)
+    spots = [ll(50, 50), ll(size_m - 60, size_m - 60), ll(size_m / 2, size_m - 30), ll(30, size_m / 2), ll(size_m * 0.7, 40)]
+    fake = FakeService(dots=spots)
+    meta = ci.build(path, mpp=0.5, margin_m=40, fetch=fake, pause_s=0, log=lambda s: None)
+    img = Image.open(ci.photo_paths(path)[0]).convert("RGB")
+    west, south, east, north = meta["bounds"]
+    for lon, lat in spots:
+        ex = (lon - west) / (east - west) * meta["width"]
+        ey = (north - lat) / (north - south) * meta["height"]
+        got = white_centroid(img, (int(ex) - 40, int(ey) - 40, int(ex) + 40, int(ey) + 40))
+        assert got is not None, (lon, lat)
+        assert got[0] == pytest.approx(ex, abs=2) and got[1] == pytest.approx(ey, abs=2), (lon, lat)
 
 
 def test_build_writes_photo_and_bounds(tmp_path):
@@ -73,28 +120,22 @@ def test_build_writes_photo_and_bounds(tmp_path):
     meta = ci.build(path, mpp=1.0, margin_m=40, fetch=fake, pause_s=0, log=lambda s: None)
     jpg, meta_path = ci.photo_paths(path)
     assert jpg.name == "square-links.photo.jpg" and meta_path.name == "square-links.photo.json"
-    img = Image.open(jpg)
-    assert img.size == (meta["width"], meta["height"])
+    assert Image.open(jpg).size == (meta["width"], meta["height"])
     assert json.loads(meta_path.read_text()) == meta
     west, south, east, north = meta["bounds"]
-    # The bounds cover the boundary plus the margin, and the pixels are about 1 m square.
     assert cl.distance_m((west, south), (east, south)) == pytest.approx(1580, abs=3)
     assert cl.distance_m((west, south), (west, north)) == pytest.approx(1580, abs=3)
-    assert len(fake.calls) == 1  # 1580 px fits in one request
-    p = fake.calls[0]
-    assert p["bboxSR"] == "4326" and p["imageSR"] == "4326" and p["f"] == "image"
+    assert len(fake.json_calls) == 1
+    p = fake.json_calls[0]
+    assert p["bboxSR"] == "4326" and p["imageSR"] == "4326" and p["f"] == "json"
     assert meta["crs"] == "EPSG:4326" and "public domain" in meta["attribution"]
 
 
-def test_big_courses_are_split_and_stitched(tmp_path):
+def test_big_courses_are_split(tmp_path):
     path = square_course(tmp_path, size_m=1500)
     fake = FakeService()
     meta = ci.build(path, mpp=0.5, margin_m=40, fetch=fake, pause_s=0, log=lambda s: None)
-    assert meta["width"] > ci.CHUNK_PX and len(fake.calls) == 4
-    img = Image.open(ci.photo_paths(path)[0]).convert("RGB")
-    # Each quarter came from a different request, so each has its own color.
-    q = [img.getpixel((x, y)) for x, y in ((10, 10), (img.width - 10, 10), (10, img.height - 10), (img.width - 10, img.height - 10))]
-    assert len({c[0] // 10 for c in q}) == 4
+    assert meta["width"] > ci.CHUNK_PX and len(fake.json_calls) == 4
 
 
 def test_blank_chunks_are_reported(tmp_path):
@@ -112,7 +153,6 @@ def test_service_errors_stop_with_the_message(tmp_path):
 
 
 def test_export_params_round_trip():
-    p = ci.export_params((-105.6, 44.2, -105.5, 44.3), 2000, 1500)
-    q = urllib.parse.parse_qs(urllib.parse.urlencode(p))
-    assert q["size"] == ["2000,1500"] and q["format"] == ["jpg"]
+    q = urllib.parse.parse_qs(urllib.parse.urlencode(ci.export_params((-105.6, 44.2, -105.5, 44.3), 2000, 1500)))
+    assert q["size"] == ["2000,1500"] and q["f"] == ["json"]
     assert [float(v) for v in q["bbox"][0].split(",")] == [-105.6, 44.2, -105.5, 44.3]

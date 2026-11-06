@@ -248,6 +248,8 @@ The report also flags numbers that look wrong: a green depth outside 8 to 60 yar
 
 Exit code 0 means every hole is ready, 3 means the file was written but some holes are not.
 
+**Scorecards and fixes** go in `courses/<course>.overrides.json`: pars, handicaps, and tee yardages, features to leave out, and a short course made of unnumbered holes. The build picks the file up by course name. The format is in `docs/course_format.md`. With a scorecard, the report gains a column comparing the mapped length of each hole with the card.
+
 Add `--save-osm courses/osm/<name>.json` to keep the raw download. It lets anyone rebuild the course file without internet access, with `build --osm-json`.
 
 ## Aerial photos

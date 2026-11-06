@@ -31,9 +31,12 @@ Status: `open`, `partial`, or `done`.
 | Newcastle Golf Course, same | Same | open | `courses/README.md` |
 | Green outlines line up with the real greens | Stand on a green edge, compare to the drawn view | partial (they line up with the USGS photos) | this file |
 | USGS aerial photos are sharp enough for the photo view | Look at each course in the photo view | open | this file |
-| Gillette Golf Club: 9 or 18 holes? | Scorecard. OpenStreetMap has greens, tees, and fairways east of the 9 holes with no hole lines; the USGS photo shows that ground still being graded | open | `courses/README.md` |
-| Bell Nob short course: wanted in the app? | It is mapped as 9 holes with no hole numbers | open | `courses/README.md` |
-| Pars for Bell Nob, Gillette Golf Club, Casper | Scorecards | open | OpenStreetMap or a pars file |
+| Gillette Golf Club: 9 or 18 holes? | Owner | done: 9 holes, the eastern expansion was abandoned | `courses/gillette-golf-club.overrides.json` |
+| Bell Nob short course: wanted in the app? | Owner | done: yes | `courses/bell-nob-golf-course.overrides.json` |
+| Bell Nob short course: hole numbers and name | Owner, against the routing preview | open | `courses/bell-nob-golf-course.overrides.json` (`numbering`, `name`) |
+| Bell Nob short course: all par 3? | Owner or its scorecard | open | same file |
+| Pars for Bell Nob, Gillette Golf Club, Casper | Scorecards | done | `courses/<course>.overrides.json` |
+| Bell Nob hole 1 tees south of the clubhouse | Owner | done: correct, the front 9 is south of the clubhouse | `courses/README.md` |
 | Time to first fix after key on | Key on, time until accuracy is under 10 yards | open | this file |
 | Yardage accuracy in open sky | Park at about 20 sprinkler heads or 150 markers, compare to their yardage | open | this file |
 | Yardage accuracy under trees | Same, on tree lined holes | open | this file |

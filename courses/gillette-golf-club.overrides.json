@@ -1,0 +1,71 @@
+{
+ "holes": 9,
+ "scorecard": {
+  "source": "ThatGolfApp scorecard (Yellow tees, converted from meters), supplied by the owner on 2026-11-06",
+  "par": [
+   5,
+   4,
+   4,
+   5,
+   3,
+   4,
+   4,
+   4,
+   3
+  ],
+  "handicap": [
+   5,
+   1,
+   3,
+   9,
+   13,
+   11,
+   7,
+   15,
+   17
+  ],
+  "tees": {
+   "Yellow": [
+    414,
+    226,
+    259,
+    416,
+    116,
+    292,
+    313,
+    222,
+    124
+   ]
+  }
+ },
+ "exclude_reason": "An eastern expansion was started and abandoned. Its greens, tees, fairways, bunkers, and range are still on OpenStreetMap.",
+ "exclude": [
+  "way/1491784711",
+  "way/1491784721",
+  "way/1491784725",
+  "way/1491784726",
+  "way/1491784734",
+  "way/1491784750",
+  "relation/20365163",
+  "way/1491784703",
+  "way/1491784706",
+  "way/1491784729",
+  "way/1491784730",
+  "way/1491784749",
+  "way/1491784754",
+  "way/1491784710",
+  "way/1491784699",
+  "way/1491784700",
+  "way/1491784707",
+  "way/1491784713",
+  "way/1491784731",
+  "way/1491784740",
+  "way/1491784743",
+  "way/1491784744",
+  "way/1491784746",
+  "way/1491784747",
+  "way/1491784748",
+  "way/1491784751",
+  "way/1491784753"
+ ]
+}

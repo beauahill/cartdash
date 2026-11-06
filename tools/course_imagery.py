@@ -42,7 +42,7 @@ SERVICE = "https://imagery.nationalmap.gov/arcgis/rest/services/USGSNAIPImagery/
 ATTRIBUTION = "Aerial imagery: USDA NAIP via USGS The National Map (public domain)"
 USER_AGENT = "cartdash-course-tool/0.1"
 MAX_REQUEST_PX = 4000  # the service's limit per request
-CHUNK_PX = 2000  # smaller requests are more reliable
+CHUNK_PX = 2000  # smaller requests are more reliable; wider pixels asked for stay under MAX_REQUEST_PX
 
 Fetch = Callable[[str, Dict[str, str]], bytes]
 
@@ -115,7 +115,7 @@ def say(text: str) -> None:
 
 def http_fetch(url: str, params: Dict[str, str], tries: int = 3) -> bytes:
     """GET with retries. The service can take minutes on an area nobody asked for recently."""
-    full = url + "?" + urllib.parse.urlencode(params)
+    full = url + ("?" + urllib.parse.urlencode(params) if params else "")
     for attempt in range(tries):
         try:
             req = urllib.request.Request(full, headers={"User-Agent": USER_AGENT})
@@ -129,6 +129,7 @@ def http_fetch(url: str, params: Dict[str, str], tries: int = 3) -> bytes:
 
 
 def export_params(bbox: Tuple[float, float, float, float], w: int, h: int) -> Dict[str, str]:
+    """exportImage request that answers with JSON: the image's link and the extent it really covers."""
     west, south, east, north = bbox
     return {
         "bbox": f"{west:.9f},{south:.9f},{east:.9f},{north:.9f}",
@@ -138,8 +139,48 @@ def export_params(bbox: Tuple[float, float, float, float], w: int, h: int) -> Di
         "format": "jpg",
         "compressionQuality": "92",
         "interpolation": "RSP_BilinearInterpolation",
-        "f": "image",
+        "f": "json",
     }
+
+
+def request_size(grid: Grid, w: int, h: int) -> Tuple[int, int]:
+    """Pixels to ask for so they are square in degrees.
+
+    The service only makes square pixels in the output reference. Asked for anything
+    else, it quietly grows the area to fit, which squashes the photo. Asking for square
+    degree pixels keeps the area as asked, and full detail in both directions; the
+    result is then resampled onto the grid's pixels, which are square in meters.
+    """
+    if grid.dlon >= grid.dlat:
+        return int(math.ceil(w * grid.dlon / grid.dlat)), h
+    return w, int(math.ceil(h * grid.dlat / grid.dlon))
+
+
+def fetch_chunk(bbox: Tuple[float, float, float, float], w: int, h: int, grid: Grid, fetch: Fetch):
+    """One chunk of the photo, exactly covering bbox at w x h pixels."""
+    from PIL import Image
+
+    rw, rh = request_size(grid, w, h)
+    data = fetch(SERVICE + "/exportImage", export_params(bbox, rw, rh))
+    try:
+        meta = json.loads(data)
+    except ValueError:
+        raise SystemExit(f"The imagery service did not answer with JSON: {data[:300].decode(errors='replace')}")
+    if "error" in meta or "href" not in meta:
+        raise SystemExit(f"The imagery service refused the request: {json.dumps(meta)[:300]}")
+    raw = fetch(meta["href"], {})
+    try:
+        img = Image.open(io.BytesIO(raw)).convert("RGB")
+    except Exception:
+        raise SystemExit(f"The imagery service did not return an image: {raw[:300].decode(errors='replace')}")
+    # Map the asked area into the returned image using the extent the service reports,
+    # so any adjustment it made is undone, then resample onto the chunk's pixels.
+    e = meta["extent"]
+    sx = img.width / (e["xmax"] - e["xmin"])
+    sy = img.height / (e["ymax"] - e["ymin"])
+    west, south, east, north = bbox
+    box = ((west - e["xmin"]) * sx, (e["ymax"] - north) * sy, (east - e["xmin"]) * sx, (e["ymax"] - south) * sy)
+    return img.transform((w, h), Image.EXTENT, box, resample=Image.BICUBIC)
 
 
 def download_photo(grid: Grid, fetch: Fetch = http_fetch, pause_s: float = 0.5, log: Callable[[str], None] = say):
@@ -148,16 +189,11 @@ def download_photo(grid: Grid, fetch: Fetch = http_fetch, pause_s: float = 0.5, 
 
     photo = Image.new("RGB", (grid.width, grid.height))
     warnings = []
-    chunks = grid.chunks()
+    stretch = max(grid.dlon / grid.dlat, grid.dlat / grid.dlon)
+    chunks = grid.chunks(min(CHUNK_PX, int(MAX_REQUEST_PX / stretch)))
     for i, (col, row, w, h, bbox) in enumerate(chunks, 1):
         started = time.time()
-        data = fetch(SERVICE + "/exportImage", export_params(bbox, w, h))
-        try:
-            tile = Image.open(io.BytesIO(data)).convert("RGB")
-        except Exception:
-            raise SystemExit(f"The imagery service did not return an image: {data[:300].decode(errors='replace')}")
-        if tile.size != (w, h):
-            tile = tile.resize((w, h))
+        tile = fetch_chunk(bbox, w, h, grid, fetch)
         lo, hi = tile.convert("L").getextrema()
         if hi - lo < 8:
             warnings.append(f"chunk {i} at column {col}, row {row} is blank; no imagery there")

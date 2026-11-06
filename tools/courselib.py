@@ -231,6 +231,7 @@ class Hole:
     tees: List[List[LonLat]] = field(default_factory=list)  # rings, or a single point
     fixed: Dict[str, LonLat] = field(default_factory=dict)  # front, center, back
     osm: Dict[str, str] = field(default_factory=dict)  # kind -> "way/123"
+    yards: Dict[str, int] = field(default_factory=dict)  # scorecard yardage by tee name
 
     def green_center(self) -> Optional[LonLat]:
         if "center" in self.fixed:
@@ -269,6 +270,43 @@ class Course:
     source: str = "OpenStreetMap"
     attribution: str = OSM_ATTRIBUTION
     built: Optional[str] = None
+    tees: List[str] = field(default_factory=list)  # scorecard tee names, longest first
+    scorecard: Optional[str] = None  # where pars, handicaps, and yardages came from
+
+
+def convex_hull(points: Sequence[LonLat], margin_m: float = 0.0) -> Ring:
+    """Closed convex hull ring around the points, grown outward by margin_m."""
+    pts = sorted(set(points))
+    if not pts:
+        return []
+    f = LocalFrame(pts[0])
+    xy = sorted({f.xy(p) for p in pts})
+    if len(xy) < 3:
+        hull = xy
+    else:
+        def cross(o, a, b):
+            return (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0])
+
+        lower, upper = [], []
+        for p in xy:
+            while len(lower) >= 2 and cross(lower[-2], lower[-1], p) <= 0:
+                lower.pop()
+            lower.append(p)
+        for p in reversed(xy):
+            while len(upper) >= 2 and cross(upper[-2], upper[-1], p) <= 0:
+                upper.pop()
+            upper.append(p)
+        hull = lower[:-1] + upper[:-1]
+    if margin_m:
+        cx = sum(p[0] for p in hull) / len(hull)
+        cy = sum(p[1] for p in hull) / len(hull)
+        grown = []
+        for x, y in hull:
+            d = math.hypot(x - cx, y - cy) or 1.0
+            grown.append((x + (x - cx) / d * margin_m, y + (y - cy) / d * margin_m))
+        hull = grown
+    ring = [f.lonlat(x, y) for x, y in hull]
+    return ring + ring[:1]
 
 
 def nearest_hole(cart: LonLat, course: Course) -> Optional[int]:
@@ -317,21 +355,24 @@ def to_geojson(course: Course) -> dict:
             attribution=course.attribution,
             osm=course.osm,
             built=course.built,
+            tees=course.tees or None,
+            scorecard=course.scorecard,
         )
     ]
     for n, h in sorted(course.holes.items()):
         if h.line:
             feats.append(_feat({"type": "LineString", "coordinates": [list(p) for p in h.line]},
-                               kind="hole", hole=n, par=h.par, handicap=h.handicap, osm=h.osm.get("hole")))
+                               kind="hole", hole=n, par=h.par, handicap=h.handicap, yards=h.yards or None,
+                               osm=h.osm.get("hole")))
         if h.green:
             feats.append(_feat(_poly(h.green), kind="green", hole=n, osm=h.osm.get("green")))
         for tee in h.tees:
             feats.append(_feat(_shape(tee), kind="tee", hole=n))
         for name, p in sorted(h.fixed.items()):
             feats.append(_feat({"type": "Point", "coordinates": list(p)}, kind=name, hole=n))
-        if not h.line and h.par is not None:
-            # Keep par even when no line of play is mapped.
-            feats.append(_feat(None, kind="hole", hole=n, par=h.par, handicap=h.handicap))
+        if not h.line and (h.par is not None or h.handicap is not None or h.yards):
+            # Keep the scorecard even when no line of play is mapped.
+            feats.append(_feat(None, kind="hole", hole=n, par=h.par, handicap=h.handicap, yards=h.yards or None))
     for ft in course.features:
         feats.append(_feat(ft.geometry, kind=ft.kind, osm=ft.osm))
     return {"type": "FeatureCollection", "features": feats}
@@ -363,6 +404,8 @@ def from_geojson(data: dict) -> Course:
             course.source = props.get("source", course.source)
             course.attribution = props.get("attribution", course.attribution)
             course.built = props.get("built")
+            course.tees = list(props.get("tees") or [])
+            course.scorecard = props.get("scorecard")
             course.boundary = _outer(geom)
             continue
         if isinstance(n, int) and kind in HOLE_KINDS:
@@ -370,6 +413,7 @@ def from_geojson(data: dict) -> Course:
             if kind == "hole":
                 h.par = props.get("par", h.par)
                 h.handicap = props.get("handicap", h.handicap)
+                h.yards = dict(props.get("yards") or h.yards)
                 if geom and geom["type"] == "LineString":
                     h.line = [tuple(p) for p in geom["coordinates"]]
             elif kind == "green":

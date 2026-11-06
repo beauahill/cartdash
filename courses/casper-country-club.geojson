@@ -10,7 +10,11 @@
     "source": "OpenStreetMap",
     "attribution": "\u00a9 OpenStreetMap contributors",
     "osm": "way/27604263",
-    "built": "2026-11-06"
+    "built": "2026-11-06",
+    "tees": [
+     "Blue"
+    ],
+    "scorecard": "Casper Country Club scorecard (Blue tees), supplied by the owner on 2026-11-06"
    },
    "geometry": {
     "type": "Polygon",
@@ -85,6 +89,11 @@
    "properties": {
     "kind": "hole",
     "hole": 1,
+    "par": 4,
+    "handicap": 5,
+    "yards": {
+     "Blue": 395
+    },
     "osm": "way/1543002925"
    },
    "geometry": {
@@ -387,6 +396,11 @@
    "properties": {
     "kind": "hole",
     "hole": 2,
+    "par": 4,
+    "handicap": 11,
+    "yards": {
+     "Blue": 301
+    },
     "osm": "way/1543002924"
    },
    "geometry": {
@@ -839,6 +853,11 @@
    "properties": {
     "kind": "hole",
     "hole": 3,
+    "par": 5,
+    "handicap": 1,
+    "yards": {
+     "Blue": 510
+    },
     "osm": "way/1543002923"
    },
    "geometry": {
@@ -1113,6 +1132,11 @@
    "properties": {
     "kind": "hole",
     "hole": 4,
+    "par": 3,
+    "handicap": 15,
+    "yards": {
+     "Blue": 144
+    },
     "osm": "way/1543002922"
    },
    "geometry": {
@@ -1505,6 +1529,11 @@
    "properties": {
     "kind": "hole",
     "hole": 5,
+    "par": 4,
+    "handicap": 9,
+    "yards": {
+     "Blue": 386
+    },
     "osm": "way/1543002921"
    },
    "geometry": {
@@ -1879,6 +1908,11 @@
    "properties": {
     "kind": "hole",
     "hole": 6,
+    "par": 3,
+    "handicap": 17,
+    "yards": {
+     "Blue": 165
+    },
     "osm": "way/1543002920"
    },
    "geometry": {
@@ -2333,6 +2367,11 @@
    "properties": {
     "kind": "hole",
     "hole": 7,
+    "par": 4,
+    "handicap": 7,
+    "yards": {
+     "Blue": 373
+    },
     "osm": "way/1543002919"
    },
    "geometry": {
@@ -2587,6 +2626,11 @@
    "properties": {
     "kind": "hole",
     "hole": 8,
+    "par": 4,
+    "handicap": 13,
+    "yards": {
+     "Blue": 384
+    },
     "osm": "way/1543002918"
    },
    "geometry": {
@@ -2975,6 +3019,11 @@
    "properties": {
     "kind": "hole",
     "hole": 9,
+    "par": 5,
+    "handicap": 3,
+    "yards": {
+     "Blue": 449
+    },
     "osm": "way/1543002917"
    },
    "geometry": {
@@ -3375,6 +3424,11 @@
    "properties": {
     "kind": "hole",
     "hole": 10,
+    "par": 4,
+    "handicap": 4,
+    "yards": {
+     "Blue": 322
+    },
     "osm": "way/1543002916"
    },
    "geometry": {
@@ -3653,6 +3707,11 @@
    "properties": {
     "kind": "hole",
     "hole": 11,
+    "par": 4,
+    "handicap": 12,
+    "yards": {
+     "Blue": 361
+    },
     "osm": "way/1543002915"
    },
    "geometry": {
@@ -4061,6 +4120,11 @@
    "properties": {
     "kind": "hole",
     "hole": 12,
+    "par": 3,
+    "handicap": 18,
+    "yards": {
+     "Blue": 177
+    },
     "osm": "way/1543002914"
    },
    "geometry": {
@@ -4371,6 +4435,11 @@
    "properties": {
     "kind": "hole",
     "hole": 13,
+    "par": 4,
+    "handicap": 6,
+    "yards": {
+     "Blue": 411
+    },
     "osm": "way/1543002913"
    },
    "geometry": {
@@ -4609,6 +4678,11 @@
    "properties": {
     "kind": "hole",
     "hole": 14,
+    "par": 5,
+    "handicap": 2,
+    "yards": {
+     "Blue": 551
+    },
     "osm": "way/1543002912"
    },
    "geometry": {
@@ -4997,6 +5071,11 @@
    "properties": {
     "kind": "hole",
     "hole": 15,
+    "par": 3,
+    "handicap": 16,
+    "yards": {
+     "Blue": 220
+    },
     "osm": "way/1543002911"
    },
    "geometry": {
@@ -5357,6 +5436,11 @@
    "properties": {
     "kind": "hole",
     "hole": 16,
+    "par": 4,
+    "handicap": 10,
+    "yards": {
+     "Blue": 392
+    },
     "osm": "way/1543002910"
    },
    "geometry": {
@@ -5647,6 +5731,11 @@
    "properties": {
     "kind": "hole",
     "hole": 17,
+    "par": 3,
+    "handicap": 14,
+    "yards": {
+     "Blue": 189
+    },
     "osm": "way/1543002909"
    },
    "geometry": {
@@ -6097,6 +6186,11 @@
    "properties": {
     "kind": "hole",
     "hole": 18,
+    "par": 4,
+    "handicap": 8,
+    "yards": {
+     "Blue": 384
+    },
     "osm": "way/1543002908"
    },
    "geometry": {

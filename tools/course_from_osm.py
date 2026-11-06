@@ -27,6 +27,7 @@ from __future__ import annotations
 
 import argparse
 import datetime as dt
+import itertools
 import json
 import re
 import sys
@@ -247,6 +248,9 @@ class BuildNotes:
     unlinked_greens: List[str] = field(default_factory=list)
     unlinked_tees: int = 0
     skipped_outside: int = 0
+    excluded: int = 0
+    numbering_inferred: bool = False
+    extra_courses: List[Tuple[cl.Course, "BuildNotes"]] = field(default_factory=list)
 
 
 def find_course_element(elements: Sequence[dict], course_ref: Optional[str]) -> dict:
@@ -262,29 +266,127 @@ def find_course_element(elements: Sequence[dict], course_ref: Optional[str]) -> 
     return courses[0]
 
 
-def build_course(elements: Sequence[dict], course_ref: Optional[str] = None) -> Tuple[cl.Course, BuildNotes]:
-    notes = BuildNotes()
-    course_el = find_course_element(elements, course_ref)
-    tags = course_el.get("tags") or {}
-    boundary = outer_ring(element_geometry(course_el))
-    course = cl.Course(
-        name=tags.get("name", "Unnamed course"),
-        boundary=boundary,
-        expected_holes=int_tag(tags, "holes"),
-        osm=ref_of(course_el),
-        built=dt.date.today().isoformat(),
-    )
-    if boundary is None:
-        notes.warnings.append("The course boundary is not mapped as an area, so nothing is filtered by it.")
+def link_greens(holes: Dict[int, cl.Hole], greens: Sequence[Tuple[dict, dict]]) -> List[Tuple[dict, dict]]:
+    """Give each hole its green: by the green's own ref, else the green where its line ends.
+
+    Returns the greens no hole claimed. A double green may serve two holes.
+    """
+    pool = []
+    for el, geom in greens:
+        n = int_tag(el.get("tags") or {}, "ref")
+        if n is not None:  # the green's own number wins, even for a hole with no line of play
+            h = holes.setdefault(n, cl.Hole(n))
+            h.green = outer_ring(geom)
+            h.osm["green"] = ref_of(el)
+        else:
+            pool.append((el, geom))
+    claimed = set()
+    for n, h in sorted(holes.items()):
+        if h.green is not None or not h.line:
+            continue
+        best = None
+        for i, (el, geom) in enumerate(pool):
+            d = cl.point_ring_m(h.line[-1], outer_ring(geom))
+            if d <= GREEN_LINK_M and (best is None or d < best[0]):
+                best = (d, i)
+        if best is not None:
+            el, geom = pool[best[1]]
+            h.green = outer_ring(geom)
+            h.osm["green"] = ref_of(el)
+            claimed.add(best[1])
+    return [g for i, g in enumerate(pool) if i not in claimed]
+
+
+def link_tees(holes: Dict[int, cl.Hole], tees: Sequence[Tuple[dict, dict]], use_ref: bool = True) -> List[Tuple[dict, dict]]:
+    """Give each tee to a hole: by ref, else the hole whose first half passes closest. Returns the rest."""
+    rest = []
+    for el, geom in tees:
+        shape = [anchor(geom)] if geom["type"] == "Point" else outer_ring(geom)
+        n = int_tag(el.get("tags") or {}, "ref") if use_ref else None
+        if n is None or n not in holes:
+            best = None
+            for hn, h in holes.items():
+                if not h.line:
+                    continue
+                d, along = cl.point_polyline_m(anchor(geom), h.line)
+                if d <= TEE_LINK_M and along <= 0.5 and (best is None or d < best[0]):
+                    best = (d, hn)
+            n = best[1] if best else None
+        if n is None:
+            rest.append((el, geom))
+            continue
+        holes[n].tees.append(shape)
+    return rest
+
+
+def infer_order(lines: Sequence[Sequence[cl.LonLat]], start_near: Optional[cl.LonLat] = None) -> List[int]:
+    """Playing order of unnumbered holes: the loop that walks least from each green to the next tee.
+
+    Starts at the hole whose tee is nearest `start_near` (the clubhouse), or after the
+    longest walk in the loop when no start is given. A guess: always confirm it.
+    """
+    n = len(lines)
+    if n <= 1:
+        return list(range(n))
+    cost = [[cl.distance_m(lines[i][-1], lines[j][0]) for j in range(n)] for i in range(n)]
+    if n <= 10:
+        best: Optional[Tuple[float, Tuple[int, ...]]] = None
+        for perm in itertools.permutations(range(1, n)):
+            cyc = (0,) + perm
+            c = sum(cost[cyc[k]][cyc[(k + 1) % n]] for k in range(n))
+            if best is None or c < best[0]:
+                best = (c, cyc)
+        cyc_list = list(best[1])
+    else:
+        cyc_list = [0]
+        while len(cyc_list) < n:
+            last = cyc_list[-1]
+            cyc_list.append(min((j for j in range(n) if j not in cyc_list), key=lambda j: cost[last][j]))
+    if start_near is not None:
+        k = min(range(n), key=lambda i: cl.distance_m(lines[cyc_list[i]][0], start_near))
+    else:
+        k = max(range(n), key=lambda i: cost[cyc_list[i - 1]][cyc_list[i]])
+    return cyc_list[k:] + cyc_list[:k]
+
+
+def apply_scorecard(course: cl.Course, card: dict, notes: BuildNotes) -> None:
+    """Pars, handicaps, and tee yardages from a scorecard, by hole number (list index 0 is hole 1)."""
+    par = card.get("par")
+    hcp = card.get("handicap")
+    tees: Dict[str, List[int]] = card.get("tees") or {}
+    lengths = {len(v) for v in [par, hcp, *tees.values()] if v}
+    if len(lengths) > 1:
+        raise SystemExit(f"{course.name}: scorecard lists have different lengths: {sorted(lengths)}")
+    if hcp and len(set(hcp)) != len(hcp):
+        raise SystemExit(f"{course.name}: scorecard handicaps repeat a number")
+    count = lengths.pop() if lengths else 0
+    for i in range(count):
+        n = i + 1
+        h = course.holes.get(n)
+        if h is None:
+            notes.warnings.append(f"The scorecard has hole {n} but the map does not.")
+            continue
+        if par:
+            if h.par and h.par != par[i]:
+                notes.warnings.append(f"Hole {n}: OpenStreetMap says par {h.par}, the scorecard says {par[i]}; using the scorecard.")
+            h.par = par[i]
+        if hcp:
+            h.handicap = hcp[i]
+        if tees:
+            h.yards = {name: int(yds[i]) for name, yds in tees.items()}
+    course.tees = list(tees)
+    course.scorecard = card.get("source")
+
+
+def collect(elements: Sequence[dict], course_el: dict, boundary: Optional[List[cl.LonLat]], exclude: set, notes: BuildNotes):
+    """Sort the elements inside the course into hole lines, greens, tees, pins, and drawn features."""
 
     def in_course(geom: dict) -> bool:
-        if boundary is None:
-            return True
-        return cl.point_ring_m(anchor(geom), boundary) <= COURSE_MARGIN_M
+        return boundary is None or cl.point_ring_m(anchor(geom), boundary) <= COURSE_MARGIN_M
 
-    greens: List[Tuple[dict, dict]] = []
-    tees: List[Tuple[dict, dict]] = []
-    pins: List[Tuple[dict, dict]] = []
+    numbered: List[Tuple[int, str, dict, List[cl.LonLat]]] = []
+    unnumbered: List[Tuple[str, List[cl.LonLat]]] = []
+    greens, tees, pins, drawn = [], [], [], []
     seen = set()
     for el in elements:
         key = ref_of(el)
@@ -294,6 +396,9 @@ def build_course(elements: Sequence[dict], course_ref: Optional[str] = None) -> 
         etags = el.get("tags") or {}
         kind = kind_of(etags)
         if kind in (None, "course"):
+            continue
+        if key in exclude:
+            notes.excluded += 1
             continue
         geom = element_geometry(el)
         if geom is None:
@@ -305,20 +410,12 @@ def build_course(elements: Sequence[dict], course_ref: Optional[str] = None) -> 
             if geom["type"] != "LineString":
                 notes.warnings.append(f"{key}: golf=hole should be a line from tee to green; skipped.")
                 continue
+            line = [tuple(p) for p in geom["coordinates"]]
             n = int_tag(etags, "ref")
             if n is None:
-                notes.warnings.append(f"{key}: hole line has no ref (hole number); skipped.")
-                continue
-            line = [tuple(p) for p in geom["coordinates"]]
-            if n in course.holes and course.holes[n].line:
-                notes.warnings.append(f"Hole {n} has more than one line of play; kept the longer one.")
-                if cl.polyline_length_m(line) <= cl.polyline_length_m(course.holes[n].line):
-                    continue
-            h = course.holes.setdefault(n, cl.Hole(n))
-            h.line = line
-            h.par = int_tag(etags, "par") or h.par
-            h.handicap = int_tag(etags, "handicap") or h.handicap
-            h.osm["hole"] = key
+                unnumbered.append((key, line))
+            else:
+                numbered.append((n, key, etags, line))
         elif kind == "green":
             if geom["type"] not in ("Polygon", "MultiPolygon"):
                 notes.warnings.append(f"{key}: green is not an area; skipped.")
@@ -331,66 +428,109 @@ def build_course(elements: Sequence[dict], course_ref: Optional[str] = None) -> 
         elif kind in DRAWN_KINDS:
             if kind != "cartpath" and geom["type"] not in ("Polygon", "MultiPolygon"):
                 continue
-            course.features.append(cl.Feature(kind, geom, key))
+            drawn.append(cl.Feature(kind, geom, key))
+    return numbered, unnumbered, greens, tees, pins, drawn
 
-    # Greens: by their own ref first, then by where each hole line ends.
-    unclaimed = []
-    for el, geom in greens:
-        n = int_tag(el.get("tags") or {}, "ref")
-        if n is not None:
-            h = course.holes.setdefault(n, cl.Hole(n))
-            h.green = outer_ring(geom)
-            h.osm["green"] = ref_of(el)
-        else:
-            unclaimed.append((el, outer_ring(geom)))
-    claimed = set()
-    for n, h in sorted(course.holes.items()):
-        if h.green is not None or not h.line:
-            continue
-        end = h.line[-1]
-        best = None
-        for i, (el, ring) in enumerate(unclaimed):
-            d = cl.point_ring_m(end, ring)
-            if d <= GREEN_LINK_M and (best is None or d < best[0]):
-                best = (d, i)
-        if best is not None:
-            el, ring = unclaimed[best[1]]
-            h.green = ring
-            h.osm["green"] = ref_of(el)
-            claimed.add(best[1])  # a double green may serve two holes, so it stays available
-    notes.unlinked_greens = [ref_of(el) for i, (el, _) in enumerate(unclaimed) if i not in claimed]
-    for i, (el, ring) in enumerate(unclaimed):
-        if i not in claimed:  # practice greens and unnumbered holes: drawn, but no yardage
-            course.features.append(cl.Feature("green", {"type": "Polygon", "coordinates": [[list(p) for p in ring]]}, ref_of(el)))
 
-    # Tees: by ref, otherwise the hole line whose first half passes closest.
-    for el, geom in tees:
-        shape = [anchor(geom)] if geom["type"] == "Point" else outer_ring(geom)
-        n = int_tag(el.get("tags") or {}, "ref")
-        if n is None:
-            best = None
-            for hn, h in course.holes.items():
-                if not h.line:
-                    continue
-                d, along = cl.point_polyline_m(anchor(geom), h.line)
-                if d <= TEE_LINK_M and along <= 0.5 and (best is None or d < best[0]):
-                    best = (d, hn)
-            n = best[1] if best else None
-        if n is None:
-            notes.unlinked_tees += 1
-            course.features.append(cl.Feature("tee", geom, ref_of(el)))  # drawn only
-            continue
-        course.holes.setdefault(n, cl.Hole(n)).tees.append(shape)
-
-    # Pins: shown on the map only. Center yardage stays the middle of the green.
+def link_pins(holes: Dict[int, cl.Hole], pins: Sequence[Tuple[dict, dict]]) -> None:
+    """Pins are shown on the map only. Center yardage stays the middle of the green."""
     for el, geom in pins:
         p = anchor(geom)
         n = int_tag(el.get("tags") or {}, "ref")
         if n is None:
-            n = next((hn for hn, h in course.holes.items() if h.green and cl.contains(h.green, p)), None)
-        if n is not None and n in course.holes:
-            course.holes[n].fixed["pin"] = p
+            n = next((hn for hn, h in holes.items() if h.green and cl.contains(h.green, p)), None)
+        if n is not None and n in holes:
+            holes[n].fixed["pin"] = p
 
+
+def build_short_course(spec: dict, parent: cl.Course, unnumbered, greens, tees, notes: BuildNotes):
+    """A second course made of the parent's unnumbered holes. Returns (course, notes, used green refs, used tee refs)."""
+    snotes = BuildNotes()
+    numbering: Dict[str, int] = spec.get("numbering") or {}
+    keys = [k for k, _ in unnumbered]
+    if numbering and set(numbering) >= set(keys):
+        order = sorted(range(len(keys)), key=lambda i: numbering[keys[i]])
+        numbers = [numbering[keys[i]] for i in order]
+    else:
+        ref_tees = [parent.holes[n].line[0] for n in (1, 10) if n in parent.holes and parent.holes[n].line]
+        start = (sum(p[0] for p in ref_tees) / len(ref_tees), sum(p[1] for p in ref_tees) / len(ref_tees)) if ref_tees else None
+        order = infer_order([line for _, line in unnumbered], start)
+        numbers = list(range(1, len(order) + 1))
+        snotes.numbering_inferred = True
+    short = cl.Course(name=spec.get("name") or f"{parent.name} short course", osm=parent.osm, built=parent.built,
+                      expected_holes=len(unnumbered))
+    for i, n in zip(order, numbers):
+        key, line = unnumbered[i]
+        short.holes[n] = cl.Hole(n, line=line, osm={"hole": key})
+    green_rest = link_greens(short.holes, greens)
+    tee_rest = link_tees(short.holes, tees, use_ref=False)
+    used_greens = {ref_of(el) for el, _ in greens} - {ref_of(el) for el, _ in green_rest}
+    used_tees = {ref_of(el) for el, _ in tees} - {ref_of(el) for el, _ in tee_rest}
+    pts = [p for h in short.holes.values() for p in (h.line or []) + (h.green or []) + [q for t in h.tees for q in t]]
+    short.boundary = cl.convex_hull(pts, margin_m=25)
+    short.features = [f for f in parent.features if f.kind not in ("green", "tee") and cl.point_ring_m(anchor(f.geometry), short.boundary) == 0]
+    if spec.get("scorecard"):
+        apply_scorecard(short, spec["scorecard"], snotes)
+    if snotes.numbering_inferred:
+        snotes.warnings.append("Hole numbers were inferred from the routing. Confirm them, then record them under numbering in the overrides file.")
+    return short, snotes, used_greens, used_tees
+
+
+def build_course(elements: Sequence[dict], course_ref: Optional[str] = None, overrides: Optional[dict] = None) -> Tuple[cl.Course, BuildNotes]:
+    """Build the course. Overrides (see docs/course_format.md) can add a scorecard, drop features, and
+    turn unnumbered holes into a second course, returned in notes.extra_courses."""
+    overrides = overrides or {}
+    notes = BuildNotes()
+    course_el = find_course_element(elements, course_ref)
+    tags = course_el.get("tags") or {}
+    boundary = outer_ring(element_geometry(course_el))
+    course = cl.Course(
+        name=overrides.get("name") or tags.get("name", "Unnamed course"),
+        boundary=boundary,
+        expected_holes=overrides.get("holes") or int_tag(tags, "holes"),
+        osm=ref_of(course_el),
+        built=dt.date.today().isoformat(),
+    )
+    if boundary is None:
+        notes.warnings.append("The course boundary is not mapped as an area, so nothing is filtered by it.")
+
+    numbered, unnumbered, greens, tees, pins, drawn = collect(elements, course_el, boundary, set(overrides.get("exclude") or []), notes)
+    course.features = drawn
+    for n, key, etags, line in numbered:
+        if n in course.holes and course.holes[n].line:
+            notes.warnings.append(f"Hole {n} has more than one line of play; kept the longer one.")
+            if cl.polyline_length_m(line) <= cl.polyline_length_m(course.holes[n].line):
+                continue
+        h = course.holes.setdefault(n, cl.Hole(n))
+        h.line = line
+        h.par = int_tag(etags, "par") or h.par
+        h.handicap = int_tag(etags, "handicap") or h.handicap
+        h.osm["hole"] = key
+
+    green_rest = link_greens(course.holes, greens)
+    tee_rest = link_tees(course.holes, tees)
+    link_pins(course.holes, pins)
+    if overrides.get("scorecard"):
+        apply_scorecard(course, overrides["scorecard"], notes)
+
+    used_greens: set = set()
+    used_tees: set = set()
+    if unnumbered and overrides.get("short_course"):
+        short, snotes, used_greens, used_tees = build_short_course(overrides["short_course"], course, unnumbered, green_rest, tee_rest, notes)
+        notes.extra_courses.append((short, snotes))
+    else:
+        for key, _ in unnumbered:
+            notes.warnings.append(f"{key}: hole line has no ref (hole number); skipped.")
+
+    # Greens and tees with no hole of their own stay on the map as drawn shapes.
+    for el, geom in green_rest:
+        course.features.append(cl.Feature("green", {"type": "Polygon", "coordinates": [[list(p) for p in outer_ring(geom)]]}, ref_of(el)))
+        if ref_of(el) not in used_greens:
+            notes.unlinked_greens.append(ref_of(el))
+    for el, geom in tee_rest:
+        course.features.append(cl.Feature("tee", geom, ref_of(el)))
+        if ref_of(el) not in used_tees:
+            notes.unlinked_tees += 1
     return course, notes
 
 
@@ -446,10 +586,11 @@ def coverage_report(course: cl.Course, notes: Optional[BuildNotes] = None) -> Tu
     lines.append("")
     rows = []
     ready = 0
+    card_tee = course.tees[0] if course.tees else None  # the first tee listed, normally the longest
     for n in numbers:
         h = course.holes.get(n)
         if h is None:
-            rows.append([str(n), "MISSING", "", "", "", "", "", "no line of play and no numbered green"])
+            rows.append([str(n), "MISSING", "", "", "", "", "", "", "no line of play and no numbered green"])
             continue
         length, depth, hnotes = hole_checks(h)
         status = "ok" if h.complete else "NO GREEN"
@@ -468,11 +609,13 @@ def coverage_report(course: cl.Course, notes: Optional[BuildNotes] = None) -> Tu
                 "yes" if h.green else "",
                 str(len(h.tees) or ""),
                 "" if length is None else f"{length:.0f}",
+                str(h.yards.get(card_tee, "")) if card_tee else "",
                 ("" if depth is None else f"depth {depth:.0f} yd") + ("; " if depth is not None and hnotes else "") + "; ".join(hnotes),
             ]
         )
-    lines.append("| Hole | Status | Par | Line | Green | Tees | Length yd | Notes |")
-    lines.append("|---|---|---|---|---|---|---|---|")
+    card_head = f"Card yd ({card_tee})" if card_tee else "Card yd"
+    lines.append(f"| Hole | Status | Par | Line | Green | Tees | Length yd | {card_head} | Notes |")
+    lines.append("|---|---|---|---|---|---|---|---|---|")
     lines += ["| " + " | ".join(r) + " |" for r in rows]
     lines.append("")
     kinds = Counter(f.kind for f in course.features)
@@ -480,7 +623,11 @@ def coverage_report(course: cl.Course, notes: Optional[BuildNotes] = None) -> Tu
     if kinds.get("green"):
         drawn += f", {kinds['green']} other greens (practice or unnumbered)"
     lines.append(f"Ready for yardage: {ready} of {expected} holes. Also mapped: {drawn}.")
+    if course.scorecard:
+        lines.append(f"Scorecard: {course.scorecard}. Tees: {', '.join(course.tees) or 'none'}.")
     if notes:
+        if notes.excluded:
+            lines.append(f"Left out {notes.excluded} features listed under exclude in the overrides file.")
         if notes.unlinked_greens:
             lines.append(f"Greens not linked to a hole: {len(notes.unlinked_greens)} ({', '.join(notes.unlinked_greens[:6])}). "
                          "Add ref=<hole number> to them, or draw the hole's line of play.")
@@ -552,21 +699,44 @@ def fetch_elements(args) -> Tuple[List[dict], str]:
     return course_els + feats, course_ref
 
 
+def overrides_path(out_dir: Path, name: str) -> Path:
+    return out_dir / f"{slug(name)}.overrides.json"
+
+
+def load_overrides(path: Optional[Path]) -> dict:
+    """Scorecard, exclusions, and short course settings for a course. Missing file means none."""
+    if path is None or not path.exists():
+        return {}
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except ValueError as exc:
+        raise SystemExit(f"{path}: not valid JSON ({exc})")
+
+
 def cmd_build(args) -> int:
     if not (args.osm_json or args.osm_id or args.name):
         raise SystemExit("Give --name, --osm-id, or --osm-json")
     elements, course_ref = fetch_elements(args)
     if args.save_osm:
         Path(args.save_osm).write_text(json.dumps({"cartdash_course": course_ref, "elements": elements}) + "\n", encoding="utf-8")
-    course, notes = build_course(elements, course_ref)
     out_dir = Path(args.out)
     out_dir.mkdir(parents=True, exist_ok=True)
-    path = out_dir / f"{slug(course.name)}.geojson"
-    cl.write_course(course, path)
-    lines, ready = coverage_report(course, notes)
-    print("\n".join(lines))
-    print(f"Wrote {path}")
-    return 0 if ready else 3
+    osm_name = (find_course_element(elements, course_ref).get("tags") or {}).get("name", "Unnamed course")
+    opath = Path(args.overrides) if args.overrides else overrides_path(out_dir, osm_name)
+    overrides = load_overrides(opath)
+    if overrides:
+        print(f"Using {opath}")
+    course, notes = build_course(elements, course_ref, overrides)
+    all_ready = True
+    for c, n in [(course, notes)] + notes.extra_courses:
+        path = out_dir / f"{slug(c.name)}.geojson"
+        cl.write_course(c, path)
+        lines, ready = coverage_report(c, n)
+        all_ready = all_ready and ready
+        print("\n".join(lines))
+        print(f"Wrote {path}")
+        print()
+    return 0 if all_ready else 3
 
 
 def cmd_report(args) -> int:
@@ -591,6 +761,7 @@ def build_parser() -> argparse.ArgumentParser:
     s.add_argument("--osm-id", help="pick the course directly, like way/123 or relation/456")
     s.add_argument("--osm-json", help="build from a saved download instead of the network")
     s.add_argument("--save-osm", help="also save the raw download here, for rebuilding offline")
+    s.add_argument("--overrides", help="overrides file (default <out>/<course name>.overrides.json if it exists)")
     s.add_argument("--out", default=str(DEFAULT_OUT), help=f"output folder (default {DEFAULT_OUT})")
 
     s = sub.add_parser("report", help="coverage report for an existing course file")

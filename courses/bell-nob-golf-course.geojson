@@ -10,7 +10,16 @@
     "source": "OpenStreetMap",
     "attribution": "\u00a9 OpenStreetMap contributors",
     "osm": "relation/3943866",
-    "built": "2026-11-06"
+    "built": "2026-11-06",
+    "tees": [
+     "Black",
+     "Blue",
+     "Green",
+     "Yellow",
+     "Junior",
+     "PAR3"
+    ],
+    "scorecard": "GSPro course scorecard, supplied by the owner on 2026-11-06"
    },
    "geometry": {
     "type": "Polygon",
@@ -225,6 +234,16 @@
    "properties": {
     "kind": "hole",
     "hole": 1,
+    "par": 5,
+    "handicap": 5,
+    "yards": {
+     "Black": 564,
+     "Blue": 516,
+     "Green": 468,
+     "Yellow": 406,
+     "Junior": 345,
+     "PAR3": 59
+    },
     "osm": "way/1543000053"
    },
    "geometry": {
@@ -499,6 +518,16 @@
    "properties": {
     "kind": "hole",
     "hole": 2,
+    "par": 4,
+    "handicap": 13,
+    "yards": {
+     "Black": 366,
+     "Blue": 332,
+     "Green": 326,
+     "Yellow": 275,
+     "Junior": 271,
+     "PAR3": 92
+    },
     "osm": "way/1543000052"
    },
    "geometry": {
@@ -807,6 +836,16 @@
    "properties": {
     "kind": "hole",
     "hole": 3,
+    "par": 4,
+    "handicap": 7,
+    "yards": {
+     "Black": 413,
+     "Blue": 382,
+     "Green": 334,
+     "Yellow": 271,
+     "Junior": 269,
+     "PAR3": 129
+    },
     "osm": "way/1543000050"
    },
    "geometry": {
@@ -1089,6 +1128,16 @@
    "properties": {
     "kind": "hole",
     "hole": 4,
+    "par": 3,
+    "handicap": 15,
+    "yards": {
+     "Black": 216,
+     "Blue": 191,
+     "Green": 165,
+     "Yellow": 143,
+     "Junior": 139,
+     "PAR3": 185
+    },
     "osm": "way/1543000049"
    },
    "geometry": {
@@ -1417,6 +1466,16 @@
    "properties": {
     "kind": "hole",
     "hole": 5,
+    "par": 4,
+    "handicap": 9,
+    "yards": {
+     "Black": 381,
+     "Blue": 363,
+     "Green": 341,
+     "Yellow": 284,
+     "Junior": 277,
+     "PAR3": 129
+    },
     "osm": "way/1543000048"
    },
    "geometry": {
@@ -1625,6 +1684,16 @@
    "properties": {
     "kind": "hole",
     "hole": 6,
+    "par": 4,
+    "handicap": 11,
+    "yards": {
+     "Black": 402,
+     "Blue": 374,
+     "Green": 338,
+     "Yellow": 306,
+     "Junior": 240,
+     "PAR3": 152
+    },
     "osm": "way/1543000047"
    },
    "geometry": {
@@ -1933,6 +2002,16 @@
    "properties": {
     "kind": "hole",
     "hole": 7,
+    "par": 5,
+    "handicap": 1,
+    "yards": {
+     "Black": 564,
+     "Blue": 507,
+     "Green": 456,
+     "Yellow": 411,
+     "Junior": 326,
+     "PAR3": 95
+    },
     "osm": "way/1543000046"
    },
    "geometry": {
@@ -2249,6 +2328,16 @@
    "properties": {
     "kind": "hole",
     "hole": 8,
+    "par": 3,
+    "handicap": 17,
+    "yards": {
+     "Black": 212,
+     "Blue": 178,
+     "Green": 150,
+     "Yellow": 132,
+     "Junior": 86,
+     "PAR3": 180
+    },
     "osm": "way/1543000045"
    },
    "geometry": {
@@ -2623,6 +2712,16 @@
    "properties": {
     "kind": "hole",
     "hole": 9,
+    "par": 4,
+    "handicap": 3,
+    "yards": {
+     "Black": 453,
+     "Blue": 417,
+     "Green": 389,
+     "Yellow": 342,
+     "Junior": 245,
+     "PAR3": 162
+    },
     "osm": "way/1543000044"
    },
    "geometry": {
@@ -2943,6 +3042,16 @@
    "properties": {
     "kind": "hole",
     "hole": 10,
+    "par": 5,
+    "handicap": 8,
+    "yards": {
+     "Black": 535,
+     "Blue": 500,
+     "Green": 445,
+     "Yellow": 437,
+     "Junior": 352,
+     "PAR3": 86
+    },
     "osm": "way/1543000043"
    },
    "geometry": {
@@ -3281,6 +3390,16 @@
    "properties": {
     "kind": "hole",
     "hole": 11,
+    "par": 4,
+    "handicap": 12,
+    "yards": {
+     "Black": 408,
+     "Blue": 378,
+     "Green": 331,
+     "Yellow": 295,
+     "Junior": 220,
+     "PAR3": 124
+    },
     "osm": "way/1543000042"
    },
    "geometry": {
@@ -3611,6 +3730,16 @@
    "properties": {
     "kind": "hole",
     "hole": 12,
+    "par": 3,
+    "handicap": 16,
+    "yards": {
+     "Black": 183,
+     "Blue": 157,
+     "Green": 138,
+     "Yellow": 108,
+     "Junior": 104,
+     "PAR3": 176
+    },
     "osm": "way/1543000041"
    },
    "geometry": {
@@ -3907,6 +4036,16 @@
    "properties": {
     "kind": "hole",
     "hole": 13,
+    "par": 4,
+    "handicap": 10,
+    "yards": {
+     "Black": 431,
+     "Blue": 400,
+     "Green": 377,
+     "Yellow": 349,
+     "Junior": 346,
+     "PAR3": 139
+    },
     "osm": "way/1543000040"
    },
    "geometry": {
@@ -4233,6 +4372,16 @@
    "properties": {
     "kind": "hole",
     "hole": 14,
+    "par": 5,
+    "handicap": 4,
+    "yards": {
+     "Black": 543,
+     "Blue": 525,
+     "Green": 492,
+     "Yellow": 415,
+     "Junior": 343,
+     "PAR3": 96
+    },
     "osm": "way/1543000039"
    },
    "geometry": {
@@ -4487,6 +4636,16 @@
    "properties": {
     "kind": "hole",
     "hole": 15,
+    "par": 4,
+    "handicap": 2,
+    "yards": {
+     "Black": 385,
+     "Blue": 336,
+     "Green": 302,
+     "Yellow": 254,
+     "Junior": 220,
+     "PAR3": 134
+    },
     "osm": "way/1543000038"
    },
    "geometry": {
@@ -4807,6 +4966,16 @@
    "properties": {
     "kind": "hole",
     "hole": 16,
+    "par": 4,
+    "handicap": 14,
+    "yards": {
+     "Black": 423,
+     "Blue": 385,
+     "Green": 367,
+     "Yellow": 343,
+     "Junior": 258,
+     "PAR3": 139
+    },
     "osm": "way/1543000037"
    },
    "geometry": {
@@ -5149,6 +5318,16 @@
    "properties": {
     "kind": "hole",
     "hole": 17,
+    "par": 3,
+    "handicap": 18,
+    "yards": {
+     "Black": 201,
+     "Blue": 197,
+     "Green": 164,
+     "Yellow": 103,
+     "Junior": 100,
+     "PAR3": 196
+    },
     "osm": "way/1543000036"
    },
    "geometry": {
@@ -5367,6 +5546,16 @@
    "properties": {
     "kind": "hole",
     "hole": 18,
+    "par": 4,
+    "handicap": 6,
+    "yards": {
+     "Black": 429,
+     "Blue": 407,
+     "Green": 371,
+     "Yellow": 317,
+     "Junior": 252,
+     "PAR3": 147
+    },
     "osm": "way/1543000035"
    },
    "geometry": {
