@@ -163,7 +163,8 @@ def test_build_course_links_and_gaps():
     assert course.holes[3].green is None
     assert len(notes.unlinked_greens) == 1
     kinds = sorted(f.kind for f in course.features)
-    assert kinds == ["bunker", "fairway", "water"]  # the next door bunker is dropped
+    assert kinds == ["bunker", "fairway", "green", "water"]  # the next door bunker is dropped
+    # The unlinked green is kept for drawing, without a hole number.
     assert notes.skipped_outside == 1
     water = next(f for f in course.features if f.kind == "water")
     assert water.geometry["type"] == "Polygon"
@@ -199,7 +200,7 @@ def test_course_file_round_trip(tmp_path):
     a = cl.green_yardage(ORIGIN, course.holes[1].green)
     b = cl.green_yardage(ORIGIN, back.holes[1].green)
     assert (a.front, a.center, a.back) == pytest.approx((b.front, b.center, b.back))
-    assert sorted(f.kind for f in back.features) == ["bunker", "fairway", "water"]
+    assert sorted(f.kind for f in back.features) == ["bunker", "fairway", "green", "water"]
 
 
 def test_build_command_offline(tmp_path, capsys):

@@ -38,6 +38,7 @@ Features that belong to a hole carry an integer `hole` property.
 | `front`, `center`, `back` | Point | yes | Optional fixed yardage points. When present they replace the computed ones. |
 | `pin` | Point | yes | Pin position from OpenStreetMap. Shown on the map only. |
 | `fairway`, `bunker`, `water`, `rough`, `range` | Polygon or MultiPolygon | no | Drawn on the map. |
+| `green`, `tee` without `hole` | Polygon or Point | no | Practice greens, or greens and tees of holes with no number. Drawn on the map, no yardage. |
 | `cartpath` | LineString | no | Drawn on the map. |
 
 Receivers ignore unknown kinds and unknown properties, like the USB link.
@@ -50,6 +51,29 @@ Receivers ignore unknown kinds and unknown properties, like the USB link.
 - **Current hole**: the hole whose line of play passes closest to the cart. Without a line, the tee to green center is used. The app adds hysteresis and manual previous and next.
 - **Course screen trigger**: the cart is inside the `course` polygon.
 - **Attribution**: show the `attribution` text on the course screen.
+
+## Aerial photo files
+
+Made by `tools/course_imagery.py`, next to the course file:
+
+- `<course>.photo.jpg`: USGS NAIP aerial photo covering the course boundary plus a margin.
+- `<course>.photo.json`: where the photo sits.
+
+```json
+{"format": 1, "course": "Bell Nob Golf Course", "image": "bell-nob-golf-course.photo.jpg",
+ "crs": "EPSG:4326", "bounds": [-105.57, 44.27, -105.55, 44.29], "width": 3699, "height": 5234,
+ "meters_per_pixel": 0.5, "source": "USGS NAIP Imagery, The National Map",
+ "attribution": "Aerial imagery: USDA NAIP via USGS The National Map (public domain)", "downloaded": "2026-11-06"}
+```
+
+`bounds` is `[west, south, east, north]`. Pixels are linear in longitude and latitude from the north west corner:
+
+```
+x = (lon - west) / (east - west) * width
+y = (north - lat) / (north - south) * height
+```
+
+The app decodes only the part of the JPEG on screen (Android `BitmapRegionDecoder`), so a large photo does not need a large amount of memory. The photo view shows the `attribution` text.
 
 ## Versioning
 

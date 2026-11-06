@@ -29,8 +29,11 @@ Status: `open`, `partial`, or `done`.
 | Gillette Golf Club, same | Same | open | `courses/README.md` |
 | Casper Country Club, same | Same | open | `courses/README.md` |
 | Newcastle Golf Course, same | Same | open | `courses/README.md` |
-| Green outlines line up with the real greens | Stand on a green edge, compare to the drawn view | open | this file |
+| Green outlines line up with the real greens | Stand on a green edge, compare to the drawn view | partial (they line up with the USGS photos) | this file |
 | USGS aerial photos are sharp enough for the photo view | Look at each course in the photo view | open | this file |
+| Gillette Golf Club: 9 or 18 holes? | Scorecard. OpenStreetMap has greens, tees, and fairways east of the 9 holes with no hole lines; the USGS photo shows that ground still being graded | open | `courses/README.md` |
+| Bell Nob short course: wanted in the app? | It is mapped as 9 holes with no hole numbers | open | `courses/README.md` |
+| Pars for Bell Nob, Gillette Golf Club, Casper | Scorecards | open | OpenStreetMap or a pars file |
 | Time to first fix after key on | Key on, time until accuracy is under 10 yards | open | this file |
 | Yardage accuracy in open sky | Park at about 20 sprinkler heads or 150 markers, compare to their yardage | open | this file |
 | Yardage accuracy under trees | Same, on tree lined holes | open | this file |

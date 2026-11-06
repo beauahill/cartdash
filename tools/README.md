@@ -7,6 +7,8 @@
 | `fake_esp.py` | Pretends to be the ESP32, for building the app without hardware |
 | `cartdash_proto.py` | Reference rules for reading the USB link, used by the other tools and tests |
 | `course_from_osm.py` | Builds a course file from OpenStreetMap and reports which holes are missing data |
+| `course_imagery.py` | Downloads the public domain USGS aerial photo for a course |
+| `course_preview.py` | Draws a course file (and its photo) as PNG images, to check it by eye |
 | `courselib.py` | Course file format and yardage math, the reference for the app's course code |
 
 Setup, once:
@@ -245,6 +247,38 @@ The report has one row per hole. A hole is **ok** when it has a green outline an
 The report also flags numbers that look wrong: a green depth outside 8 to 60 yards, a tiny green, or a length that does not fit the par. Check those against the scorecard.
 
 Exit code 0 means every hole is ready, 3 means the file was written but some holes are not.
+
+Add `--save-osm courses/osm/<name>.json` to keep the raw download. It lets anyone rebuild the course file without internet access, with `build --osm-json`.
+
+## Aerial photos
+
+Download the photo for a course (about a minute per course, longer the first time an area is asked for):
+
+```bash
+python3 tools/course_imagery.py courses/bell-nob-golf-course.geojson
+```
+
+It writes `<course>.photo.jpg` and `<course>.photo.json` next to the course file. NAIP photos are flown every two to three years, so recent construction may not show yet.
+
+## Checking a course by eye
+
+Draw the whole course and every hole the way the course screen shows it, into `courses/preview/<course>/` (not committed):
+
+```bash
+python3 tools/course_preview.py courses/bell-nob-golf-course.geojson
+```
+
+The same on the aerial photo:
+
+```bash
+python3 tools/course_preview.py courses/bell-nob-golf-course.geojson --photo
+```
+
+In the overview, a magenta outline is a green that is not linked to a hole and an orange one is a tee not linked to a hole. Practice greens and range tees normally show up this way; anything else is a hole that needs its line of play on OpenStreetMap. The previews need matplotlib, and the photo tools need Pillow:
+
+```bash
+pip install matplotlib pillow
+```
 
 ---
 

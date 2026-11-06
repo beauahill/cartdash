@@ -359,6 +359,9 @@ def build_course(elements: Sequence[dict], course_ref: Optional[str] = None) -> 
             h.osm["green"] = ref_of(el)
             claimed.add(best[1])  # a double green may serve two holes, so it stays available
     notes.unlinked_greens = [ref_of(el) for i, (el, _) in enumerate(unclaimed) if i not in claimed]
+    for i, (el, ring) in enumerate(unclaimed):
+        if i not in claimed:  # practice greens and unnumbered holes: drawn, but no yardage
+            course.features.append(cl.Feature("green", {"type": "Polygon", "coordinates": [[list(p) for p in ring]]}, ref_of(el)))
 
     # Tees: by ref, otherwise the hole line whose first half passes closest.
     for el, geom in tees:
@@ -375,6 +378,7 @@ def build_course(elements: Sequence[dict], course_ref: Optional[str] = None) -> 
             n = best[1] if best else None
         if n is None:
             notes.unlinked_tees += 1
+            course.features.append(cl.Feature("tee", geom, ref_of(el)))  # drawn only
             continue
         course.holes.setdefault(n, cl.Hole(n)).tees.append(shape)
 
@@ -473,6 +477,8 @@ def coverage_report(course: cl.Course, notes: Optional[BuildNotes] = None) -> Tu
     lines.append("")
     kinds = Counter(f.kind for f in course.features)
     drawn = ", ".join(f"{kinds[k]} {k}" for k in DRAWN_KINDS if kinds.get(k)) or "none"
+    if kinds.get("green"):
+        drawn += f", {kinds['green']} other greens (practice or unnumbered)"
     lines.append(f"Ready for yardage: {ready} of {expected} holes. Also mapped: {drawn}.")
     if notes:
         if notes.unlinked_greens:

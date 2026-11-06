@@ -27,8 +27,9 @@ __pycache__/
 .venv/
 venv/
 
-# Analyzer output (regenerate from the captures)
+# Analyzer and preview output (regenerate from the data)
 captures/**/plots/
+courses/preview/
 
 # Editors and OS
 .idea/

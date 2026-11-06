@@ -1,0 +1,19 @@
+{
+ "format": 1,
+ "course": "Newcastle Country Club",
+ "image": "newcastle-country-club.photo.jpg",
+ "crs": "EPSG:4326",
+ "bounds": [
+  -104.24050720242002,
+  43.84515878168317,
+  -104.21839155012181,
+  43.85025792814549
+ ],
+ "width": 3547,
+ "height": 1134,
+ "meters_per_pixel": 0.5,
+ "source": "USGS NAIP Imagery, The National Map",
+ "service": "https://imagery.nationalmap.gov/arcgis/rest/services/USGSNAIPImagery/ImageServer",
+ "attribution": "Aerial imagery: USDA NAIP via USGS The National Map (public domain)",
+ "downloaded": "2026-11-06"
+}

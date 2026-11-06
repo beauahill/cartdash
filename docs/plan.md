@@ -110,15 +110,17 @@ Done when the emulator shows the dash on fake data and the ESP32 streams simulat
 Starts once the Phase 0 app exists. Nothing here needs cart hardware until G3.
 
 G1, course data:
-- [x] `tools/course_from_osm.py`: query OpenStreetMap for a course, write `courses/<name>.geojson`, and report each hole as ok, NO GREEN, or MISSING, with sanity checks on green depth, green size, and length for the par. Tested on synthetic OpenStreetMap data; not yet run against the live Overpass API.
+- [x] `tools/course_from_osm.py`: query OpenStreetMap for a course, write `courses/<name>.geojson`, and report each hole as ok, NO GREEN, or MISSING, with sanity checks on green depth, green size, and length for the par. First live run on 2026-11-06 (from the laptop; Overpass refuses cloud sessions even with the host allowed).
 - [x] Course file format: `docs/course_format.md`. Yardage reference: `tools/courselib.py`.
-- [ ] Build and check each course (`courses/README.md` tracks them):
-  - [ ] Bell Nob, Gillette
-  - [ ] Gillette Golf Club, Gillette
-  - [ ] Casper Country Club, Casper
-  - [ ] Newcastle Golf Course, Newcastle
+- [x] Build and check each course (`courses/README.md` tracks them). All 54 mapped holes are ready for yardage:
+  - [x] Bell Nob, Gillette: 18 of 18. A 9 hole short course is also mapped, without hole numbers, and is left out for now.
+  - [x] Gillette Golf Club, Gillette: 9 of 9. More holes appear to be mapped without hole lines; see `docs/verify.md`.
+  - [x] Casper Country Club, Casper: 18 of 18.
+  - [x] Newcastle Country Club, Newcastle: 9 of 9.
+- [ ] Pars: only Newcastle has them on OpenStreetMap. Add `par` to each hole line there, or enter them from the scorecards.
+- [x] `tools/course_preview.py` draws a course and each hole as PNGs, on the drawn shapes or the photo, to check data by eye.
 - [ ] Fix gaps by tracing in the OpenStreetMap editor (iD), whose satellite layers are licensed for tracing. Those satellite images cannot be downloaded for the app, which is why the photo view uses USGS imagery.
-- [ ] `tools/course_imagery.py`: download USGS NAIP aerial imagery covering each course boundary into an MBTiles file (a standard tile file QGIS can open) next to the course file. NAIP is about 0.6 m per pixel, so a green 25 to 30 m across is about 45 pixels: fine as a background, soft up close. Written once the USGS services can be reached, so it is tested against the real service. If NAIP looks too soft, sharper commercial imagery needs an account and that vendor's SDK for offline use.
+- [x] `tools/course_imagery.py`: one JPEG per course from the USGS NAIP image service, cut to the course boundary plus 40 m, with a sidecar giving its bounds (`docs/course_format.md`). The USGS basemap tiles stop at zoom 16 (about 1.7 m per pixel here), too coarse, so it uses the NAIP export service at 0.5 m per pixel instead. A green 25 to 30 m across is about 50 pixels: fine as a background, soft up close. Mapped green outlines line up with the greens in the photos. NAIP is flown every two to three years, so new construction can be missing (Gillette Golf Club's east side). If NAIP looks too soft, sharper commercial imagery needs an account and that vendor's SDK for offline use.
 
 G2, yardage engine and course screen (emulator):
 - `Yardage.kt`, pure Kotlin with unit tests:

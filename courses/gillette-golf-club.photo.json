@@ -1,0 +1,19 @@
+{
+ "format": 1,
+ "course": "Gillette Golf Club",
+ "image": "gillette-golf-club.photo.jpg",
+ "crs": "EPSG:4326",
+ "bounds": [
+  -105.47969214256919,
+  44.26212779683009,
+  -105.46557631637475,
+  44.27081972814549
+ ],
+ "width": 2248,
+ "height": 1933,
+ "meters_per_pixel": 0.5,
+ "source": "USGS NAIP Imagery, The National Map",
+ "service": "https://imagery.nationalmap.gov/arcgis/rest/services/USGSNAIPImagery/ImageServer",
+ "attribution": "Aerial imagery: USDA NAIP via USGS The National Map (public domain)",
+ "downloaded": "2026-11-06"
+}
