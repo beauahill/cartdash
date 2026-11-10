@@ -20,7 +20,7 @@ The brief is `README.md`. This file tracks the order of work, status, and decisi
 ## Hardware status
 
 - [ ] Head unit (ordered). On arrival, run the checks in `docs/verify.md` while it can still be disputed.
-- [ ] Mating connectors: DJ7161Y-2.3-11 (16 pin), DJ7091Y-2.3-11 (9 pin), DJ613-2.3A terminals. Order now, they usually ship from China. Not needed for the CAN capture (back-probing), needed for Phase 2.
+- [ ] Mating connectors: DJ7161Y-2.3-11 (16 pin), DJ7091Y-2.3-11 (9 pin), DJ613-2.3A terminals. Ordered from Amazon 2026-11-10, due end of November. Being checked against the connectors on the factory screen. Not needed for the CAN capture (back-probing), needed for Phase 2.
 - [ ] Isolated CANable 2.0 or other candleLight adapter, flashed with candleLight firmware so Linux sees it as `can0` through the `gs_usb` driver.
 - [ ] ESP32-S3 N16R8 board, PC817 and 6N137 optos, small 12V to 5V buck.
 - [ ] Isolated CAN transceiver for the ESP32 to Kelly link. An ADM3053 module is simplest because it makes its own isolated supply. An ISO1050 needs a separate isolated 5V on the bus side.
