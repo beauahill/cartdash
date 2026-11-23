@@ -52,7 +52,8 @@ For each digital line also record: switches 12V or switches to ground, voltage, 
 | 9 pin: hole count and wires | Look | done: 9 holes, 6 wires | `docs/pinout.md` |
 | Function of each of the 14 wires | Meter, worksheet in `docs/pinout.md` | open | `docs/pinout.md` |
 | Which wire is constant 12V, and is it live with the key off | Meter, key off | partial: none found at the screen plugs (2026-11-23) | `docs/pinout.md` |
-| Is there constant 12V anywhere on the cart | Meter at the 12V converter output or fuse block, key off | open | `docs/plan.md` |
+| Is there constant 12V anywhere on the cart | Meter at the 12V converter output or fuse block, key off | likely none: the converter has a keyed enable (owner); confirm with a meter | `docs/plan.md` |
+| Head unit cold boot time with constant and ACC tied together | Bench, stopwatch, on arrival | open | `docs/plan.md` (power decision) |
 | 9 pin black: 12V ground or pack negative | Volts between the two plug blacks, key on | partial: same ground as the 16 pin black (0 V); confirm with ohms, key off | `docs/pinout.md` |
 | Is the 12V system isolated from the pack, or does the converter share its negative | Ohms, key off, plug black to the controller's B- terminal | likely shared: 68 V and 12 V both read against the same black | `docs/pinout.md` |
 | 16 pin red: switched or constant | Meter, key off and on | done: 12 V with the key on only (switched, ACC) | `docs/pinout.md` |

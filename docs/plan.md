@@ -41,9 +41,12 @@ Found 2026-11-23: no constant 12V at the factory screen plugs. The screen gets p
 
 Both readings were taken against the same black wire, and the two plug blacks are the same ground, so the cart's 12V negative is very likely the pack negative (a non-isolated converter). The brief assumed the two systems were isolated. Its rules still stand, for a different reason: under heavy motor current the shared negative cable can sit a volt or two off between the controller and the dash, which upsets CAN links and inputs that are not isolated. So keep the optos and the isolated CAN transceiver, and add no new ground paths (no frame bonds). Confirm the shared negative with ohms from a plug black to the controller's B- terminal, key off.
 
-Next check: the 12V converter output (or fuse block) with the key off.
-- Constant 12V exists somewhere: tap it there, and the plan stands.
-- The converter is switched by the key: everything 12V dies at key off. The ESP32 then simply powers off with the key (no light sleep, no last MQTT publish unless a hold-up capacitor is added), and the head unit cold boots Android at every key on (roughly 20 to 40 s) instead of waking from sleep. The usual fix is a small DC-DC converter from the pack (60 to 72 V in, 12 V out, a few amps, fused at the pack) as a constant feed. If the shared negative is confirmed, it does not need to be an isolated one. Plan for long storage too (a switch, or relying on the brief's sleep rules), so it cannot slowly drain the pack over a winter. Its standby draw is tiny against a 130 Ah pack. Decide once the check is done.
+The 12V converter has a keyed enable wire (owner, 2026-11-23; confirm with a meter at its output, key off), so there is no constant 12V anywhere on the cart. Two ways forward:
+
+- **A. Everything off the key.** No extra hardware. The ESP32 boots in about a second at key on and powers off with the key, so the brief's ACC light sleep and last MQTT publish go away (charge reporting is already on the wish list). The head unit cold boots Android at every key on, roughly 15 to 40 s, and loses power abruptly at every key off; most units cope, some lose settings or the clock.
+- **B. An always-on 12V feed from the pack.** A 60 to 72 V in, 12 V out buck converter, fused at the pack, feeding the head unit's constant input and the ESP32; it need not be isolated if the shared negative is confirmed. The head unit then sleeps and wakes in a second or two. Size it for the head unit's full running current (about 10 A): on these units the constant input carries the operating power and ACC is only a signal. Choose one with a low idle draw and add a storage switch, so an idle converter and a sleeping head unit cannot drain the pack over a winter.
+
+Decision rule: when the head unit arrives, power it on the bench with its constant and ACC inputs tied together and time a cold boot. About 15 s or less: A. Painfully slow: B. Update the brief's power rules once decided. Either way the app saves trip data every few seconds, so abrupt power loss costs at most a few seconds of trip.
 
 ## Order of work
 
