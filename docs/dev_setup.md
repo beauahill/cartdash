@@ -70,7 +70,7 @@ Make the SDK tools available in a terminal by adding these lines to `~/.bashrc`:
 
 ```bash
 export ANDROID_HOME=$HOME/Android/Sdk
-export PATH=$PATH:$ANDROID_HOME/platform-tools:$ANDROID_HOME/emulator
+export PATH=$ANDROID_HOME/platform-tools:$ANDROID_HOME/emulator:$PATH
 ```
 
 An emulator that looks like the head unit: Android 12 (API 31), the plain x86_64 image with no Google Play (the head unit may not have it either), 2000 x 1200 at density 240, landscape. From a terminal:
@@ -163,20 +163,32 @@ The app starts on its own simulator (SIM badge). Tap SOURCE at the bottom left t
 The head unit's USB ports are hosts (they will talk to the ESP32), so ADB goes over Wi-Fi. Android 12 has Wireless debugging built in.
 
 1. On the head unit, open Settings, System, Developer options. The code is 7890 followed by the hour on the 24 hour clock, two digits: at 4 PM it is 789016, at 9 AM 789009. The settings menus behind 8888 and 123456 are different: change nothing there. Once ADB works, `adb -s <IP>:<port> shell am start -a android.settings.APPLICATION_DEVELOPMENT_SETTINGS` opens Developer options with no code.
-2. In Developer options, turn on USB debugging and Wireless debugging. Put the head unit and the laptop on the same Wi-Fi.
-3. Tap Wireless debugging, then Pair device with pairing code. It shows an address with a pairing port and a six digit code. On the laptop:
+2. In Developer options, turn on USB debugging and Wireless debugging. Join the head unit to the same Wi-Fi as the laptop, as a normal client. Not a guest network: guest networks and some mesh routers stop devices from reaching each other. If wireless CarPlay is active, disconnect the phone first, since CarPlay can take over the head unit's Wi-Fi radio.
+3. Use the SDK's `adb`, not Ubuntu's. `which -a adb` lists every copy on the PATH, and `adb version` must say 30.0.0 or newer for `pair`. Ubuntu 22.04's `adb` package is version 29, and the setup above adds the SDK to the end of the PATH, so Ubuntu's copy wins if it is installed. Use the full path `~/Android/Sdk/platform-tools/adb` (or put `$ANDROID_HOME/platform-tools` first in the PATH). Mixing two versions also makes each one restart the shared adb server, which briefly drops other projects' emulators.
+4. Tap Wireless debugging, then Pair device with pairing code. A popup shows an address with a pairing port and a six digit code. While the popup is still open, on the laptop:
 
 ```bash
-adb pair <head unit IP>:<pairing port>
+~/Android/Sdk/platform-tools/adb pair <head unit IP>:<pairing port> <code>
 ```
 
-4. Type the code when asked. Then connect to the address on the main Wireless debugging screen (a different port from the pairing one):
+It answers `Successfully paired`, and the laptop appears under Paired devices on the head unit. Each popup has a new port and code; closing it ends that pairing attempt.
+
+5. Close the popup and connect to the address on the main Wireless debugging screen (a different port from the pairing one):
 
 ```bash
-adb connect <head unit IP>:<port>
+~/Android/Sdk/platform-tools/adb connect <head unit IP>:<port>
 ```
 
-5. `adb devices` lists it as `<IP>:<port>`. Address it with `adb -s <IP>:<port>`, never bare `adb`, because the emulator is running too.
+6. `adb devices` lists it as `<IP>:<port>`. Address it with `adb -s <IP>:<port>`, never bare `adb`, because the emulator is running too.
+
+If pairing fails:
+
+| Message | Cause |
+|---|---|
+| `unknown command`, or a usage listing | Old `adb` (Ubuntu's package). Use the SDK's (step 3). |
+| `Failed: Wrong password or connection was dropped` | Code mistyped, popup closed, or the main screen's port was used instead of the popup's. Open a new popup. |
+| `protocol fault (couldn't read status message)` | An older adb server is running because two `adb` versions are in use. Use the SDK's only. |
+| `Unable to connect`, `No route to host`, or a timeout | Network. `ping <head unit IP>` must answer; see step 2. |
 
 The port changes each time Wireless debugging restarts (Wi-Fi drop, sleep, reboot), so repeat `adb connect` after a key cycle. Pairing is remembered. This is for the bench only: on the cart the head unit's Wi-Fi belongs to wireless CarPlay, and nothing in the design needs it on Wi-Fi.
 
