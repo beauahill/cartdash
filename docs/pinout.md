@@ -48,7 +48,7 @@ There are 14 wires in all. The manual lists 17 functions apart from speakers (8 
 
 > **High voltage in the screen plugs.** The 9 pin red/blue wire reads 68 V with the key on (2026-11-23): that is traction pack voltage. Keep it taped and away from everything, and never connect it to the head unit, the ESP32, or anything on the 12V side.
 >
-> **Shared negative (likely).** Both blacks are the same ground (0 V between them), and both the 68 V and the 12 V wires measure against it, so the cart's 12V negative is very likely the pack negative: the 12V converter does not isolate. Confirm with ohms, key off, from a plug black to the motor controller's B- terminal (about 0 ohms).
+> **Shared negative (likely).** Both blacks are the same ground (0 V between them), and both the 68 V and the 12 V wires measure against it, so the cart's 12V negative is very likely the pack negative. Two checks, each in one place: (1) at the 12V converter, key off, ohms between its input negative and output negative (about 0 ohms means shared, open means an isolated converter); (2) at the dash with the screen unplugged, key on, volts between the harness red/blue and black (still 68 V means the harness ties them; 0 V means the screen's board was doing it, and the bond leaves with the screen).
 
 Fill in at the cart with a multimeter, with the factory screen plugged in. Write down where the black meter lead was for every reading. Probing through the rubber seals is hard and can tear them; with the screen's back open, it is easier to touch each wire where it enters the small connectors on the screen's board. One probe at a time, and do not bridge neighboring pins.
 
