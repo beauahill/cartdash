@@ -8,18 +8,19 @@ Status: `open`, `partial`, or `done`.
 
 | Item | How to check | Status | Record in |
 |---|---|---|---|
-| Chip is UIS7862S | CPU-Z | open | this file |
-| 8 GB RAM, 128 GB storage | CPU-Z | open | this file |
-| Android version is 12 | Settings or CPU-Z. If older, lower `minSdk`. | open | this file, `android/app/build.gradle.kts` |
-| Screen resolution about 2000x1200 | CPU-Z, or `adb shell wm size` | open | this file |
-| Screen density | `adb shell wm density` (dp layout depends on it) | open | this file |
+| Chip is UIS7862S | CPU-Z | done 2026-11-23: UIS7862S, 2x Cortex-A75 and 6x Cortex-A55 at 2.0 GHz, Mali-G52 | this file |
+| 8 GB RAM, 128 GB storage | CPU-Z | done: 7556 MB RAM, 106 GB usable storage | this file |
+| Android version is 12 | Settings or CPU-Z. If older, lower `minSdk`. | done: reports "13", but API level 32 and build SP1A.210812.016, so it is Android 12L. `minSdk` 31 is fine; do not rely on Android 13 (API 33) behavior | this file, `android/app/build.gradle.kts` |
+| Screen resolution about 2000x1200 | CPU-Z, or `adb shell wm size` | done: 2000 x 1200 | this file |
+| Screen density | `adb shell wm density`, or a debug readout in the app of `densityDpi` and width and height in dp | partial: CPU-Z says 358 dpi, from which it computes a 6.52 inch screen, so it may not be the density the layout uses. At 358 the dash gets about 894 x 536 dp; at 240, about 1333 x 800 dp | this file |
 | Sleeps or shuts down on ACC off | Key off, wait, key on. Does `BOOT_COMPLETED` fire? | open | this file |
 | Broadcast sent on wake | `adb logcat` across a key off and on cycle | open | this file |
 | CarPlay app package name | `adb shell pm list packages` | open | this file |
 | Own "default desktop" setting | Head unit settings | open | this file |
 | USB host sees the ESP32 with VBUS cut | Bench test with the cut cable | open | `docs/pinout.md` |
 | Has a GPS receiver and an external antenna | Box contents, GPS test app | open | this file |
-| Google Play services present (not required, the app uses `LocationManager`) | Settings, apps | open | this file |
+| Google Play services present (not required, the app uses `LocationManager`) | CPU-Z | done: present (21.30.16) | this file |
+| Developer options code (needed for ADB over Wi-Fi) | Seller, manual, or common codes | open: developer options ask for a code | this file |
 
 ## Course GPS
 
