@@ -50,18 +50,28 @@ There are 14 wires in all. The manual lists 17 functions apart from speakers (8 
 >
 > **Shared negative (likely).** Both blacks are the same ground (0 V between them), and both the 68 V and the 12 V wires measure against it, so the cart's 12V negative is very likely the pack negative. Two checks, each in one place: (1) at the 12V converter, key off, ohms between its input negative and output negative (about 0 ohms means shared, open means an isolated converter); (2) at the dash with the screen unplugged, key on, volts between the harness red/blue and black (still 68 V means the harness ties them; 0 V means the screen's board was doing it, and the bond leaves with the screen).
 
-Fill in at the cart with a multimeter, with the factory screen plugged in. Write down where the black meter lead was for every reading. Probing through the rubber seals is hard and can tear them; with the screen's back open, it is easier to touch each wire where it enters the small connectors on the screen's board. One probe at a time, and do not bridge neighboring pins.
+**What this is:** you find what each wire does by watching its voltage while you work the cart's controls.
 
-0. **Which ground is which.** Key on, volts, between the 9 pin black and the 16 pin black. About 0 V: the same ground. Anything else: two separate systems (12V negative and pack negative). Then measure each black against the 12V converter's negative output terminal; the one at 0 V is 12V ground. Use that as the meter reference for everything else, and mark the other black as pack negative.
-1. **Ground first.** Key off, meter on ohms: a wire with about 0 ohms to 12V negative is ground.
-2. **Key off, volts:** 12 V now is the constant 12V feed (powers the ESP32 and the head unit memory).
-3. **Key on, nothing touched:** a wire that jumps to 12 V is ACC. Two wires sitting around 2 to 3 V are probably the CAN pair; confirm with key off, ohms between them: about 60 or 120 ohms.
-4. **Work the controls one at a time** and watch for a wire that changes: low beam, high beam, left blinker, right blinker (flashes between 0 and 12 V), brake pedal, parking brake, speed mode switch, shift to R.
-5. **Note which way it switches.** Some lines go from 0 to 12 V when active, others drop from 12 V to 0 (switched to ground). The opto wiring differs, so record both.
-6. **Speed pulse:** push the cart slowly or spin a drive wheel with it jacked up. The pulse wire flickers on a DC range and shows a changing frequency on Hz mode.
-7. A wire that never changes stays unused until it is understood.
+**Setup, once**
+1. Meter on DC volts. Clip the black meter lead to either black wire (they are the same ground). An alligator clip frees your hands.
+2. Park brake on, a wheel chocked, foot off the accelerator the whole time.
+3. Touch the red lead to one wire at a time where it enters the small connectors on the screen's board (easier than probing through the rubber seals, which can tear). One probe at a time; do not bridge neighboring pins.
+4. Skip red/blue (68 V). The blacks and the 16 pin red are done.
 
-| Plug | Wire color | Hole number | Key off (V) | Key on (V) | Changes when | Switches 12V or GND | Function | Date |
+**For each remaining wire (about a minute each)**
+1. Key off: write the number.
+2. Key on: write the number.
+3. Watching the meter, work each control for about 2 seconds: left blinker on and off, right blinker on and off, headlights low, high, off, brake pedal press and release, park brake release and set, shift F, N, R, back to N, and the speed or mode switch if there is one.
+4. If the number jumps, write which control did it and whether it went **up** (0 to 12) or **down** (12 to 0). Flashing on and off is a blinker.
+5. If nothing moves it, write "nothing".
+
+**Special cases**
+- About 2 to 3 V with the key on, and nothing moves it: probably a CAN wire; note the exact number. Two of those is the CAN pair. Confirm with the key off: about 60 or 120 ohms between them.
+- Last, for wires still at "nothing": roll the cart a few feet with the key on (or have someone push). A wire that flickers as the wheels turn is the speed pulse.
+
+**Reporting:** one line per wire is plenty, for example `orange: off 0, on 0, headlights -> up to 12` or `blue: off 0, on 2.6, nothing`. A helper makes it twice as fast: one watches the meter, one works the controls.
+
+| Plug | Wire color | Hole number | Key off (V) | Key on (V) | What makes it move | Up or down | Function | Date |
 |---|---|---|---|---|---|---|---|---|
 | 9 pin | orange | | | | | | | |
 | 9 pin | green/yellow | | | | | | | |
