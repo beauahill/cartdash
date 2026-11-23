@@ -15,6 +15,7 @@ The brief is `README.md`. This file tracks the order of work, status, and decisi
 | 2026-11-05 | Course maps with front, center, and back yardage are a primary feature (Track G). It is app only: GPS from the head unit's receiver, course data from OpenStreetMap stored on the head unit. |
 | 2026-11-05 | Courses: Bell Nob (Gillette), Gillette Golf Club (Gillette), Casper Country Club (Casper), Newcastle Golf Course (Newcastle). |
 | 2026-11-05 | The course screen has two views: holes drawn as shapes, and an aerial photo view. Photos are USGS NAIP aerial imagery, which is public domain and so can be stored on the head unit with no account or license terms. |
+| 2026-11-23 | No CAN bus at the factory screen: the candidate wires are speaker outputs (millivolts key on, open circuit between pairs). The factory CAN capture (Track A) is dropped and the Kelly swap can happen any time. |
 | 2026-11-05 | 3 to 5 yards of accuracy is good enough. The head unit's GPS is the plan; a GNSS module on the ESP32 only if on-course checks come out worse than that. |
 
 ## Hardware status
@@ -57,11 +58,12 @@ Decision rule: when the head unit arrives, power it on the bench with its consta
 
 ### Track A: Factory CAN capture (before the Kelly swap)
 
-**Likely not needed (2026-11-23).** The wire worksheet (`docs/pinout.md`) found no CAN bus at the factory screen: every candidate wire sat at millivolts with the key on, where a powered bus idles at about 2.5 V. The screen gets everything it shows from its own wires (blinkers, headlights, forward gear, speed pulse, pack voltage). One ohms check settles it (16 pin holes 13/14 and 15/16, key off). If it confirms, the steps below are dropped, the Kelly swap no longer waits on anything, and the capture tools are kept for sniffing the Kelly in Phase 4.
+**Dropped (2026-11-23): there is no CAN bus at the factory screen.** The candidate wires sat at millivolts with the key on (a powered bus idles near 2.5 V) and read open circuit between pairs, because they are the screen's speaker outputs to speakers no longer connected. The screen gets everything it shows from its own wires (blinkers, headlights, forward gear, speed pulse, pack voltage). The Kelly swap no longer waits on anything. The capture tools are kept for sniffing the Kelly in Phase 4. The unchecked steps below no longer apply.
 
 - [x] `tools/can_capture.py` and `tools/can_log_analyze.py`, tested against synthetic captures. Usage is in `tools/README.md`.
 - [x] Wire worksheet at the factory screen plugs: functions, hole numbers, readings in `docs/pinout.md`.
-- [ ] Ohms check on the two candidate pairs.
+- [x] Ohms check on the two candidate pairs: open circuit on both (speaker outputs).
+- [ ] At or after the swap: does the speed pulse (9 pin hole 9) still pulse, and does forward (16 pin hole 7) still switch? If either came from the Tianji, it goes dead with it.
 - [ ] Bench check: plug in the CANable, run `can_capture.py check` and `can_capture.py setup`.
 - [ ] Meter checks from the brief (CANH to CANL resistance, idle voltages). For every digital line on both factory plugs also record: does it switch 12V or switch to ground, its voltage, whether it is PWM, and whether it comes from the Tianji or from a switch. Lines that come from the Tianji (speed pulse, speed mode, maybe reverse) disappear after the swap just like its CAN traffic.
 - [ ] Bitrate scan (`can_capture.py scan`).
@@ -116,7 +118,7 @@ Done when the emulator shows the dash on fake data and the ESP32 streams simulat
 - The isolated side ground of the transceiver goes only to the Kelly CAN ground. Check whether the Kelly already terminates the bus before adding 120 ohms.
 - The ESP32 has one CAN controller, so it sits on the Kelly bus only.
 - Serial fallback uses RS232 levels and needs an isolated RS232 transceiver. It probably shares the port with the Kelly Bluetooth adapter.
-- Gear source: decide from the factory capture. After the swap the gear rocker likely wires to the Kelly direction inputs, so the Kelly may report it.
+- Gear source: the factory screen read forward gear from its own wire (16 pin hole 7). After the swap the gear rocker likely wires to the Kelly direction inputs, so the Kelly may report direction; reverse may need a tap at the rocker.
 - Regen warning: Kelly battery current in the charge direction while pack voltage is above 71 V. Until the Kelly is decoded, use BMS charge current while speed is above 2 mph (charge current while parked is the charger).
 
 ### Phase 5: Home Assistant

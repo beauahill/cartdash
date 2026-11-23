@@ -27,7 +27,7 @@ Both are sealed connectors (a yellow rubber seal on each wire). The colors are t
 | **1** light blue: no signal found | **2** black: ground | **3** empty | **4** red: switched 12V |
 | **5** empty | **6** empty | **7** white: forward gear | **8** empty |
 | **9** empty | **10** empty | **11** empty | **12** empty |
-| **13** green/yellow: no signal | **14** green: no signal | **15** blue/white: no signal | **16** blue: no signal |
+| **13** green/yellow: speaker | **14** green: speaker | **15** blue/white: speaker | **16** blue: speaker |
 
 The face side is the mirror image (left and right swap). Photos of both sides: `photos/factory-screen-*.jpg`. These hole numbers agree with the layout worked out from the photos.
 
@@ -44,10 +44,10 @@ The face side is the mirror image (left and right swap). Photos of both sides: `
 | 16 pin | 4 | red | 0 | 12 | Key | Switched 12V |
 | 16 pin | 7 | white | about 0 | about 0 | Up to 12 V in Forward | Forward gear |
 | 16 pin | 1 | light blue | about 0 | about 0 | Nothing | Unknown |
-| 16 pin | 13 | green/yellow | about 0 | about 0 | Nothing | No signal |
-| 16 pin | 14 | green | about 0 | about 0 | Nothing | No signal |
-| 16 pin | 15 | blue/white | about 0 | about 0 | Nothing | No signal |
-| 16 pin | 16 | blue | about 0 | about 0 | Nothing | No signal |
+| 16 pin | 13 | green/yellow | about 0 | about 0 | Nothing | Speaker output, pair with 14 (open circuit: speaker disconnected) |
+| 16 pin | 14 | green | about 0 | about 0 | Nothing | Speaker output, pair with 13 |
+| 16 pin | 15 | blue/white | about 0 | about 0 | Nothing | Speaker output, pair with 16 (open circuit: speaker disconnected) |
+| 16 pin | 16 | blue | about 0 | about 0 | Nothing | Speaker output, pair with 15 |
 | 16 pin | 2 | black | | | | Ground (0 V to the 9 pin black) |
 
 Notes from the owner and the worksheet:
@@ -59,7 +59,7 @@ Notes from the owner and the worksheet:
 
 ### What this means
 
-- **No CAN bus at the screen (likely).** A powered CAN bus idles at about 2.5 V on both wires; every candidate read millivolts with the key on. The factory screen gets everything it shows from its own wires: blinkers, headlights, forward gear, speed pulse, and pack voltage for its battery gauge. To make it certain, key off, ohms between 16 pin holes 15 and 16 (blue/white and blue) and between 13 and 14 (green/yellow and green). No pair at about 60 or 120 ohms means no CAN wiring at all; a pair that does is a terminated bus with nothing on it. Either way there is nothing to capture.
+- **No CAN bus at the screen (confirmed).** A powered CAN bus idles at about 2.5 V on both wires and shows 60 or 120 ohms of termination between them; the candidates read millivolts with the key on and open circuit between pairs. They are the screen's two speaker outputs (blue with blue/white, green with green/yellow), to speakers that are no longer connected. The factory screen gets everything it shows from its own wires: blinkers, headlights, forward gear, speed pulse, and pack voltage for its battery gauge.
 - **For the ESP32, from these plugs:** left turn (9 pin 1), right turn (9 pin 6), headlights (9 pin 2), forward gear (16 pin 7), speed pulse (9 pin 9), switched 12V (16 pin 4), ground (9 pin 7, 16 pin 2).
 - **Not at these plugs**, to be tapped at their switches in Phase 2: brake, park brake, high beam, reverse, speed mode.
 - **Speed pulse source unknown.** If it comes from the Tianji controller it stops after the Kelly swap; Kelly RPM is the fallback.
@@ -73,7 +73,7 @@ Meter on DC volts, black lead on a black wire, red lead on the wire where it ent
 | Check | Expected if CAN is present | Measured | Date |
 |---|---|---|---|
 | Candidate pairs (16 pin 13/14, 15/16), key on | about 2.5 V each | millivolts on all four | 2026-11-23 |
-| Ohms between 15 and 16, and between 13 and 14, key off | about 60 or 120 ohms | | |
+| Ohms between 15 and 16, and between 13 and 14, key off | about 60 or 120 ohms | open circuit (0L) on both: speaker outputs, not CAN | 2026-11-23 |
 
 ## What the manual claims (manual p.58, reference only)
 

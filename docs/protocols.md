@@ -51,7 +51,7 @@ The JBD current sign already matches the USB link convention (negative is discha
 
 ## Factory CAN bus (original Tianji controller to factory screen)
 
-Status: not captured yet. Bitrate unknown. Fill this in from the capture sessions (see `tools/README.md`) and keep `docs/factory_can.dbc` in sync.
+Status: **not present on this cart** (2026-11-23). The factory screen has no CAN bus; it reads blinkers, headlights, forward gear, a speed pulse, and pack voltage on its own wires (`docs/pinout.md`). The table below is unused.
 
 | ID | Rate | Bytes | Meaning | Scale and offset | Evidence (session, marker) | Confidence |
 |---|---|---|---|---|---|---|

@@ -58,7 +58,7 @@ For each digital line also record: switches 12V or switches to ground, voltage, 
 | 9 pin black: 12V ground or pack negative | Volts between the two plug blacks, key on | partial: same ground as the 16 pin black (0 V); confirm with ohms, key off | `docs/pinout.md` |
 | Is the 12V system isolated from the pack, or does the converter share its negative | Key off, ohms between the converter's input and output negatives; and key on, screen unplugged, volts between harness red/blue and black | likely shared: 68 V and 12 V both read against the same black | `docs/pinout.md` |
 | 16 pin red: switched or constant | Meter, key off and on | done: 12 V with the key on only (switched, ACC) | `docs/pinout.md` |
-| Is there a CAN pair at the screen at all | Two wires at about 2.5 V key on, 60 or 120 ohms between them key off | likely none: all candidates at millivolts key on; ohms check pending | `docs/pinout.md` |
+| Is there a CAN pair at the screen at all | Two wires at about 2.5 V key on, 60 or 120 ohms between them key off | done: none. Candidates at millivolts key on, open circuit between pairs; they are speaker outputs | `docs/pinout.md` |
 | CANH to CANL resistance, cart off (60 or 120 ohms) | Meter | open | `docs/pinout.md` |
 | CAN idle voltages, key on (about 2.5 V each) | Meter | open | `docs/pinout.md` |
 | Speed pulse: amplitude, push-pull or open collector, pulses per wheel turn, source | Scope or meter | partial: found on 9 pin hole 9 (yellow); amplitude, pulses per turn, and source (Tianji or sensor) still open | `docs/pinout.md` |
@@ -70,9 +70,7 @@ For each digital line also record: switches 12V or switches to ground, voltage, 
 
 | Item | How to check | Status | Record in |
 |---|---|---|---|
-| Bitrate | `can_capture.py scan` | open | `docs/protocols.md` |
-| Standard or extended IDs | Capture | open | `docs/protocols.md` |
-| Gear, speed or RPM, throttle, voltage, current, fault fields | Capture sessions and analyzer | open | `docs/protocols.md`, `docs/factory_can.dbc` |
+| Factory CAN bus exists | Meter at the screen plugs | done: no, the screen uses discrete wires (2026-11-23); bitrate, IDs, and fields do not apply | `docs/pinout.md` |
 
 ## BMS
 

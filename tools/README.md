@@ -37,7 +37,7 @@ Run the tests with `python3 -m pytest tools/tests`.
 
 # Factory CAN capture
 
-This has to happen before the Tianji controller comes out, because the bus goes quiet after the swap and cannot be captured again. The plan and the gate are in `docs/plan.md` (Track A).
+> **Not needed on this cart (2026-11-23).** The factory screen has no CAN bus (`docs/pinout.md`), so there is nothing to capture before the Kelly swap. The steps below are kept because the same tools and workflow are used to sniff the Kelly in Phase 4: use `--bus kelly`.
 
 ## Before going to the cart
 

@@ -226,6 +226,8 @@ docs/
 
 ## Factory CAN capture (time sensitive, do before the Kelly swap)
 
+> **Update 2026-11-23: not needed on this cart.** The factory screen has no CAN bus. Its candidate wires sit at millivolts with the key on and read open circuit between pairs (they are speaker outputs), and the screen gets everything it shows from its own wires. See `docs/pinout.md`. The Kelly swap no longer waits on this, and the capture tools are kept for sniffing the Kelly in Phase 4. The section below is kept as written.
+
 Goal: learn what the original Tianji controller sent to the factory screen, especially gear (D/N/R), speed, and any fault or mode signals, before the Tianji is removed. This runs on a laptop and is independent of the firmware and app work. It can happen in parallel with Phase 0.
 
 ### Wire check (manual, with a meter)
@@ -270,7 +272,7 @@ Do these in order. Each phase ends with something that runs.
 
 **Phase 3: BMS over BLE.** Scan and log advertised names and services to identify the BMS. Implement JBD first behind a decoder interface. Auto reconnect.
 
-**Phase 4: Kelly decode.** After the Kelly is installed, sniff it with the laptop adapter and the same capture and analysis tools used for the factory bus, with an isolated connection. Target fields: RPM, phase current, battery current, controller temp, motor temp, fault codes, direction. Fall back to the Kelly serial port if there is no CAN. Then implement the decoder on the ESP32 behind the isolated transceiver, with raw frame logging available as `log` lines when enabled from the app. Anything learned from the factory bus capture (gear especially) informs where gear comes from after the swap: the Kelly, the gear rocker, or both.
+**Phase 4: Kelly decode.** After the Kelly is installed, sniff it with the laptop adapter and the same capture and analysis tools used for the factory bus, with an isolated connection. Target fields: RPM, phase current, battery current, controller temp, motor temp, fault codes, direction. Fall back to the Kelly serial port if there is no CAN. Then implement the decoder on the ESP32 behind the isolated transceiver, with raw frame logging available as `log` lines when enabled from the app. Gear after the swap comes from the Kelly, the gear rocker, or both. The factory screen read forward gear from its own wire (`docs/pinout.md`); check whether that wire still works after the swap.
 
 **Phase 5: Home Assistant.** MQTT with HA discovery when STA is connected. Publish at 1 Hz. Main use is SOC and charging status while parked at home.
 
