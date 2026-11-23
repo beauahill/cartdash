@@ -48,7 +48,7 @@ USB is the primary link because wireless CarPlay uses the head unit's WiFi radio
 ## Electrical rules (do not violate)
 
 - The cart has a 60V LiFePO4 traction pack and a 12V accessory system made by a buck converter. Measured 2026-11-23: the converter is non-isolated, so 12V negative and pack negative are the same conductor (`docs/pinout.md`). Do not add any other connection between the 12V and 60V wiring, and never bond anything to the cart frame. The frame is not bonded to either system.
-- The 12V system is switched by the key: the converter has a keyed enable, so there is no constant 12V on the cart. How the ESP32 and head unit get constant power is an open decision in `docs/plan.md`.
+- The 12V system is switched by the key: the converter has a keyed enable, so there is no constant 12V on the cart. So the ESP32 and the head unit get constant power from an added always-on 60V to 12V buck converter fed from the pack (decided 2026-11-23; parts and wiring in `docs/plan.md`).
 - The factory screen plug carries traction pack voltage (68 V, key on) on 9 pin hole 8. Never connect it to anything on the 12V side.
 - The Kelly controller lives on the 60V side. Any connection to it (CAN or serial) must go through an isolated transceiver or isolator. No shared ground between the ESP32 and the Kelly. The negatives are joined at the converter, but heavy motor current can shift the negative by a volt or two between the controller and the dash, which is what the isolation protects against.
 - Every 12V input goes through an opto isolator. No 12V line connects directly to an ESP32 GPIO.
