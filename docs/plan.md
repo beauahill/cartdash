@@ -35,6 +35,14 @@ Cloud sessions cannot reach the PlatformIO registry, GitHub downloads, or `dl.go
 
 The Python tools need only PyPI, which already works. Course files need the OpenStreetMap Overpass API (`overpass-api.de`) and aerial photos need the USGS imagery services (`basemap.nationalmap.gov`, `imagery.nationalmap.gov`). Cloud sessions cannot reach those either, so run the course tools on the laptop or allow those hosts too.
 
+## Open question: power for the ESP32 and head unit
+
+Found 2026-11-23: no constant 12V at the factory screen plugs. The screen gets pack voltage (68 V, key switched) on the 9 pin red/blue, and the 16 pin red is 12 V with the key on. The brief assumed a constant 12V feed for the ESP32 and for the head unit's memory input.
+
+Next check: the 12V converter output (or fuse block) with the key off.
+- Constant 12V exists somewhere: tap it there, and the plan stands.
+- The converter is switched by the key: everything 12V dies at key off. The ESP32 then simply powers off with the key (no light sleep, no last MQTT publish unless a hold-up capacitor is added), and the head unit cold boots Android at every key on (roughly 20 to 40 s) instead of waking from sleep. The usual fix is a small isolated DC-DC converter from the pack (60 to 72 V in, 12 V out, a few amps, fused at the pack) as a constant feed. Its standby draw is tiny against a 130 Ah pack. Decide once the check is done.
+
 ## Order of work
 
 ### Step 0: Repo foundation

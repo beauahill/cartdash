@@ -38,7 +38,7 @@ When wiring a new plug, put each function's wire in the same hole the screen's w
 
 ### Likely grouping (a guess from the colors, not yet measured)
 
-The 9 pin colors look like the usual car radio power colors: yellow constant 12V, black ground, orange illumination, pink reverse, with red/blue probably ACC and green/yellow perhaps a speed mode line. That is most of the manual's "16 pin" list without its speakers. If so, the 16 pin plug carries the cart signals from the manual's "9 pin" list (beams, blinkers, brakes, speed pulse, and CAN if there is one), with the two plugs' labels swapped in the manual. On the 16 pin, look for two wires twisted together as the CAN pair; a solid color with its striped partner (blue and blue/white, green and green/yellow) is a common way to code one. The meter decides.
+The 9 pin colors look like the usual car radio power colors: yellow constant 12V, black ground, orange illumination, pink reverse, with green/yellow perhaps a speed mode line. (Red/blue turned out to be pack voltage, not ACC, and no constant 12V has been found yet, so treat this guess with care.) That is most of the manual's "16 pin" list without its speakers. If so, the 16 pin plug carries the cart signals from the manual's "9 pin" list (beams, blinkers, brakes, speed pulse, and CAN if there is one), with the two plugs' labels swapped in the manual. On the 16 pin, look for two wires twisted together as the CAN pair; a solid color with its striped partner (blue and blue/white, green and green/yellow) is a common way to code one. The meter decides.
 
 **The manual's pin table does not match this cart.** The manual puts illumination (orange), reverse camera (pink), 12V constant (yellow), and high speed (gray) on the 16 pin plug; on this cart those colors are on the 9 pin plug. Treat the manual's functions as a list of what might be there, not where.
 
@@ -46,9 +46,12 @@ There are 14 wires in all. The manual lists 17 functions apart from speakers (8 
 
 ## Wire identification worksheet
 
-Fill in at the cart with a multimeter, with the factory screen plugged in. Black meter lead on 12V ground for every voltage reading. Probing through the rubber seals is hard and can tear them; with the screen's back open, it is easier to touch each wire where it enters the small connectors on the screen's board. One probe at a time, and do not bridge neighboring pins.
+> **High voltage in the screen plugs.** The 9 pin red/blue wire reads 68 V with the key on (2026-11-23): that is traction pack voltage. Keep it taped and away from everything, and never connect it to the head unit, the ESP32, or anything on the 12V side. The 9 pin black may be the pack's negative rather than 12V ground; do not connect it to anything until step 0 says which it is.
 
-1. **Ground first.** Key off, meter on ohms: a wire with about 0 ohms to 12V negative is ground. There may be two (one black on each plug).
+Fill in at the cart with a multimeter, with the factory screen plugged in. Write down where the black meter lead was for every reading. Probing through the rubber seals is hard and can tear them; with the screen's back open, it is easier to touch each wire where it enters the small connectors on the screen's board. One probe at a time, and do not bridge neighboring pins.
+
+0. **Which ground is which.** Key on, volts, between the 9 pin black and the 16 pin black. About 0 V: the same ground. Anything else: two separate systems (12V negative and pack negative). Then measure each black against the 12V converter's negative output terminal; the one at 0 V is 12V ground. Use that as the meter reference for everything else, and mark the other black as pack negative.
+1. **Ground first.** Key off, meter on ohms: a wire with about 0 ohms to 12V negative is ground.
 2. **Key off, volts:** 12 V now is the constant 12V feed (powers the ESP32 and the head unit memory).
 3. **Key on, nothing touched:** a wire that jumps to 12 V is ACC. Two wires sitting around 2 to 3 V are probably the CAN pair; confirm with key off, ohms between them: about 60 or 120 ohms.
 4. **Work the controls one at a time** and watch for a wire that changes: low beam, high beam, left blinker, right blinker (flashes between 0 and 12 V), brake pedal, parking brake, speed mode switch, shift to R.
@@ -62,9 +65,9 @@ Fill in at the cart with a multimeter, with the factory screen plugged in. Black
 | 9 pin | green/yellow | | | | | | | |
 | 9 pin | pink | | | | | | | |
 | 9 pin | yellow | | | | | | | |
-| 9 pin | red/blue | | | | | | | |
+| 9 pin | red/blue | | | 68 | | | Pack voltage, key switched (likely the screen's power or "voltage detect"). **High voltage, do not use.** | 2026-11-23 |
 | 9 pin | black | | | | | | | |
-| 16 pin | red | | | | | | | |
+| 16 pin | red | | ? | 12 | | | 12V, key on; key off not yet checked | 2026-11-23 |
 | 16 pin | blue | | | | | | | |
 | 16 pin | blue/white | | | | | | | |
 | 16 pin | green | | | | | | | |
