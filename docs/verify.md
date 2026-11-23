@@ -107,3 +107,6 @@ For each digital line also record: switches 12V or switches to ground, voltage, 
 |---|---|---|---|
 | USB VBUS is isolated from the 5V rail (or cable has VBUS cut) | Board schematic, meter | open | `docs/pinout.md` |
 | Opening the port from Android does not reset the chip | Watch `uptime_s` in `hello` | open | this file |
+| Board is N16R8 (16 MB quad flash, 8 MB octal PSRAM) | `pio run -t upload` boot log, or `esptool.py flash_id` | open | this file, `firmware/platformio.ini` |
+| Native USB shows up as USB Serial/JTAG, VID 0x303A, PID 0x1001 (the firmware uses the built-in USB Serial/JTAG port, `ARDUINO_USB_MODE=1`) | `lsusb` on the laptop, then the head unit | open | this file, `res/xml/usb_device_filter.xml` (Phase 1) |
+| Phase 0 stream: `pio device monitor` shows a `hello` and then about 10 `state` lines a second, no raw text after boot | Serial monitor on the laptop | open | `docs/plan.md` (Phase 0) |

@@ -1,0 +1,30 @@
+name: firmware
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  firmware:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: firmware
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/cache@v4
+        with:
+          path: ~/.platformio
+          key: pio-${{ hashFiles('firmware/platformio.ini') }}
+      - run: pip install platformio -r ../tools/requirements.txt
+      - name: Native unit tests (against protocol/fixtures)
+        run: pio test -e native
+      - name: Build for the ESP32-S3
+        run: pio run -e esp32s3
+      - name: Simulated stream through the reference receiver and the schema
+        run: |
+          pio run -e host
+          python -m pytest ../tools/tests/test_firmware_stream.py -q

@@ -38,7 +38,11 @@ Check: `python3 -m pytest tools/tests -q` passes.
 sudo apt install -y openjdk-17-jdk
 ```
 
-Check: `java -version` says 17.
+Check: `java -version` says 17. If a newer JDK is the default (`/usr/lib/jvm` holds several), point Gradle at 17 instead of changing the default:
+
+```bash
+export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+```
 
 ## 4. Android Studio, SDK, and emulator
 
@@ -69,9 +73,36 @@ export ANDROID_HOME=$HOME/Android/Sdk
 export PATH=$PATH:$ANDROID_HOME/platform-tools:$ANDROID_HOME/emulator
 ```
 
-An emulator that looks like the head unit: in Android Studio, Device Manager, create a device with a new hardware profile: 10.1 inch, 2000 x 1200, landscape, with an Android 12 (API 31) x86_64 system image. Adjust the resolution and density once the real head unit's numbers are in `docs/verify.md`.
+An emulator that looks like the head unit: Android 12 (API 31), the plain x86_64 image with no Google Play (the head unit may not have it either), 2000 x 1200 at density 240, landscape. From a terminal:
+
+```bash
+sdkmanager "system-images;android-31;default;x86_64"
+```
+
+```bash
+avdmanager create avd -n cartdash_headunit -k "system-images;android-31;default;x86_64" -d "10.1in WXGA (Tablet)"
+```
+
+Then set `hw.lcd.width=2000`, `hw.lcd.height=1200`, `hw.lcd.density=240`, `hw.initialOrientation=landscape`, and `hw.ramSize=2048` in `~/.android/avd/cartdash_headunit.avd/config.ini`. Adjust the resolution and density once the real head unit's numbers are in `docs/verify.md`. (`sdkmanager` and `avdmanager` live in `$ANDROID_HOME/cmdline-tools/latest/bin`.)
 
 Check: `adb version` works and `emulator -list-avds` lists the device.
+
+Two things to know about the emulator:
+
+- **Memory.** It used 3.3 GB once booted, with `hw.ramSize=2048`. With 16 GB of RAM, a second emulator or another project's Gradle daemons can run the laptop out of memory, and the kernel then kills an emulator. Run one emulator at a time, and do not build with Gradle while it boots.
+- **Port 5555.** An emulator on the default console port (5554) also holds host port 5555, which is the port `fake_esp.py` and `TcpSource` use. Start the Cart Dash emulator on another port, and if any other emulator is on 5554, run `fake_esp.py` on another port too and tell the app:
+
+```bash
+emulator -avd cartdash_headunit -port 5580
+```
+
+```bash
+python3 tools/fake_esp.py --tcp 5600
+```
+
+```bash
+adb -s emulator-5580 shell am start -n com.cartdash/.MainActivity --es source TCP --ei tcp_port 5600
+```
 
 ## 5. PlatformIO (ESP32 firmware)
 
@@ -97,6 +128,36 @@ Log out and back in after the `usermod` commands so the new groups apply.
 
 Check: `pio --version` works. With the ESP32-S3 plugged into its native USB port, `ls /dev/ttyACM*` shows it.
 
+## 6. Phase 0: build and run
+
+Firmware, from `firmware/`:
+
+```bash
+pio test -e native
+```
+
+```bash
+pio run -e host && .pio/build/host/program 5
+```
+
+That prints 5 s of the simulated stream on the laptop, no board needed. With the board plugged in:
+
+```bash
+pio run -t upload && pio device monitor
+```
+
+Android, from `android/` (`local.properties` with `sdk.dir=$HOME/Android/Sdk` is made by Android Studio, or write it by hand):
+
+```bash
+./gradlew testDebugUnitTest assembleDebug
+```
+
+```bash
+adb -s emulator-5580 install -r app/build/outputs/apk/debug/app-debug.apk
+```
+
+The app starts on its own simulator (SIM badge). Tap SOURCE at the bottom left to switch to TCP and `fake_esp.py`.
+
 ## Installing the app on the head unit without ADB
 
 The head unit's developer options are locked by a code we do not have yet (its Factory settings code is 8888; change nothing there except a USB or ADB debugging switch, if it has one). Until then, install builds over Wi-Fi from the laptop:
@@ -107,7 +168,7 @@ python3 -m http.server 8000 --directory android/app/build/outputs/apk/debug
 
 On the head unit, open `http://<laptop IP>:8000/app-debug.apk` in the browser and allow it to install. `hostname -I` on the laptop shows its IP; both must be on the same Wi-Fi. Without ADB, the app keeps its own log and shows it on a debug screen.
 
-## 6. Claude Code on the laptop
+## 7. Claude Code on the laptop
 
 ```bash
 curl -fsSL https://claude.ai/install.sh | bash

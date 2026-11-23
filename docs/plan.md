@@ -17,6 +17,9 @@ The brief is `README.md`. This file tracks the order of work, status, and decisi
 | 2026-11-05 | The course screen has two views: holes drawn as shapes, and an aerial photo view. Photos are USGS NAIP aerial imagery, which is public domain and so can be stored on the head unit with no account or license terms. |
 | 2026-11-23 | No CAN bus at the factory screen: the candidate wires are speaker outputs (millivolts key on, open circuit between pairs). The factory CAN capture (Track A) is dropped and the Kelly swap can happen any time. |
 | 2026-11-05 | 3 to 5 yards of accuracy is good enough. The head unit's GPS is the plan; a GNSS module on the ESP32 only if on-course checks come out worse than that. |
+| 2026-11-23 | Firmware platform pinned to espressif32 8.0.0, which is Arduino core 3.3.12 (ESP-IDF 5.x APIs for TWAI, PCNT, and sleep). JSON with ArduinoJson 7.4.2. Serial is the S3's built-in USB Serial/JTAG port (`ARDUINO_USB_MODE=1`, `ARDUINO_USB_CDC_ON_BOOT=1`), core debug output off. |
+| 2026-11-23 | Android data layer: `DataSource` emits raw JSON lines, not `Flow<CartState>` as the brief's layout says, and `CartLink` does the parsing and link status for every source. That way Sim, TCP, and USB all go through the same parser and the same 1 s link timer, and link status counts every line, not just `state`. `CartLink` lives in the Application until `LinkService` takes it over in Phase 1. Firmware files beyond the brief's layout: `protocol.cpp` (JSON out, line reader, cmd handling), `logic.cpp` (blinker latch, speed math), `config_store.cpp` (NVS), `host_main.cpp` (laptop stream). |
+| 2026-11-23 | Android toolchain: AGP 9.5.2, Kotlin 2.4.21, Gradle 9.9.2, JDK 17. compileSdk is 37.2 because the current Compose libraries require it; minSdk stays 31. Package `com.cartdash`. JSON with kotlinx.serialization, parsed to `JsonObject` and type checked by hand, so the receiver rules match `tools/cartdash_proto.py`. |
 
 ## Hardware status
 
@@ -93,6 +96,17 @@ Android:
 - Build the dash in an emulator profile with the head unit's real resolution and density (`adb shell wm density`). Heavy font with tabular digits so numbers do not jitter, and a small dead band on displayed speed.
 
 Done when the emulator shows the dash on fake data and the ESP32 streams simulated JSON in a serial monitor.
+
+Status (2026-11-23):
+- [x] Firmware scaffold in `firmware/`: shared state with a timestamp per field and staleness decided at send time, JSON out, cmd handling with a `log` reply for each command, NVS config, the simulator (drops Kelly data from 70 s to 75 s of every 90 s so fields go stale), USB send and command tasks, task watchdog. Builds for the S3.
+- [x] Firmware native tests (`pio test -e native`, 19 cases): state lines against `state_full`, `state_minimal`, and `state_stale`, hello, log, all of `cmd.jsonl`, bad commands, `garbage.jsonl` and the 2048 byte limit through the line reader, staleness edges and `millis()` wrap, blinker latch, speed math, simulator.
+- [x] `pio run -e host` builds the simulator and JSON builder for the laptop; `tools/tests/test_firmware_stream.py` runs 120 s of its stream through `cartdash_proto.parse_line` and the JSON schema.
+- [x] Android app in `android/`: protocol parser, line splitter with the 2048 byte cap, `DataSource`, `SimSource`, `TcpSource` (reconnects with backoff), `CartLink` (link lost after 1 s without a line), and the dash. Tapping SOURCE on the dash switches Sim and TCP for now; `--es source TCP` does the same from adb.
+- [x] Android unit tests (`./gradlew testDebugUnitTest`, 25 cases) port the receiver checks in `tools/tests/test_protocol.py` against the same fixtures, plus the link timer, line splitter, simulator, speed dead band, and `TcpSource` against a local server (reconnect, send, prompt cancel).
+- [x] CI jobs for the firmware and the Android app (`.github/workflows/firmware.yml`, `android.yml`). Not yet run on GitHub.
+- [x] Dash seen running in the `cartdash_headunit` emulator (2000x1200, density 240) on `SimSource` and over TCP on each `fake_esp.py` scenario. Seen in screenshots: right blinker arrow lit, brake, low beam, regen kW in green, the night theme following the headlights, the amber regen warning (71.6 V, +30 A while moving), BMS and controller fault banners, stale Kelly and BMS readings shown as `--` while the rest update, and LINK LOST during the dropout. Same layout at density 160. Not captured in a screenshot yet: left blinker lit, gear R, park brake. The check found two problems that are now fixed: the gear letter was cut off, and the speed `--` was not dimmed. The cell tile was cut to the lowest cell from the layout arithmetic beforehand.
+- [ ] Flash an ESP32-S3 and watch the stream in `pio device monitor`. Needs the board (Hardware status above).
+- Deferred on purpose: the app sending every `set_config` after each connect needs the settings screen (Phase 6) to have values worth sending.
 
 ### Phase 1: Real link on the head unit
 - The ESP32-S3 built-in USB port resets the chip on some DTR/RTS changes. The app sets both lines explicitly after opening the port. Watch `uptime_s` in `hello` to catch unexpected resets.
