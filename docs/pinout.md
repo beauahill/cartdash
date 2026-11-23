@@ -4,12 +4,41 @@ Confirmed pins and wiring. Do not wire to anything until its row is filled in fr
 
 ## Factory screen connectors, as found (2026-11-23)
 
-Both are sealed connectors (a yellow rubber seal on each wire, white plugs in unused holes). Checked by the owner with the factory screen out:
+Both are sealed connectors (a yellow rubber seal on each wire). Checked by the owner with the factory screen out. The colors below are the wires of the **screen's pigtail**: the screen-side half of each plug, whose wires run to small connectors on the screen's circuit board. The cart harness side may use other colors; what carries over is the hole each function sits in.
 
-| Connector | Holes | Wires | Wire colors |
+| Connector | Holes | Wires | Wire colors (screen side) |
 |---|---|---|---|
 | DJ7161Y (16 pin) | 16 | 8 | red, blue, blue/white, green, green/yellow, light blue, black, white |
-| DJ7091Y (9 pin) | 9 | 6 | orange, gray/yellow, pink, yellow, red/blue, black |
+| DJ7091Y (9 pin) | 9 | 6 | orange, green/yellow, pink, yellow, red/blue, black |
+
+**Which half the new plugs must be.** The screen-side half is the one with a deep square shroud, terminals recessed inside, and a yellow comb across the face (`photos/factory-screen-9pin-face.jpg`, `photos/factory-screen-16pin-face.jpg`). The harness-side half has a flat yellow face. The plugs replacing the screen must be the screen-side kind, or they will not mate with the harness.
+
+### Hole layout, screen side, seen from the wire side
+
+The empty holes make each pattern lopsided, so turn the plug until its empty holes match the table. The face side is the mirror image (left and right swap). Photos: `photos/factory-screen-9pin-wire-side.jpg`, `photos/factory-screen-16pin-wire-side.jpg`, `photos/factory-screen-16pin-wire-side-2.jpg`.
+
+9 pin:
+
+| | Left | Middle | Right |
+|---|---|---|---|
+| Top | yellow | red/blue | black |
+| Middle | pink | empty | empty |
+| Bottom | empty | green/yellow | orange |
+
+16 pin, latch on the right:
+
+| | 1 | 2 | 3 | 4 |
+|---|---|---|---|---|
+| Top | red | empty | empty | blue |
+| 2 | empty | white | empty | blue/white |
+| 3 | black | empty | empty | green |
+| Bottom | light blue | empty | empty | green/yellow |
+
+When wiring a new plug, put each function's wire in the same hole the screen's wire for that function uses.
+
+### Likely grouping (a guess from the colors, not yet measured)
+
+The 9 pin colors look like the usual car radio power colors: yellow constant 12V, black ground, orange illumination, pink reverse, with red/blue probably ACC and green/yellow perhaps a speed mode line. That is most of the manual's "16 pin" list without its speakers. If so, the 16 pin plug carries the cart signals from the manual's "9 pin" list (beams, blinkers, brakes, speed pulse, and CAN if there is one), with the two plugs' labels swapped in the manual. On the 16 pin, look for two wires twisted together as the CAN pair; a solid color with its striped partner (blue and blue/white, green and green/yellow) is a common way to code one. The meter decides.
 
 **The manual's pin table does not match this cart.** The manual puts illumination (orange), reverse camera (pink), 12V constant (yellow), and high speed (gray) on the 16 pin plug; on this cart those colors are on the 9 pin plug. Treat the manual's functions as a list of what might be there, not where.
 
@@ -17,7 +46,7 @@ There are 14 wires in all. The manual lists 17 functions apart from speakers (8 
 
 ## Wire identification worksheet
 
-Fill in at the cart with a multimeter. Back-probe from the wire side with thin pins, with the factory screen plugged in. Black meter lead on 12V ground for every voltage reading.
+Fill in at the cart with a multimeter, with the factory screen plugged in. Black meter lead on 12V ground for every voltage reading. Probing through the rubber seals is hard and can tear them; with the screen's back open, it is easier to touch each wire where it enters the small connectors on the screen's board. One probe at a time, and do not bridge neighboring pins.
 
 1. **Ground first.** Key off, meter on ohms: a wire with about 0 ohms to 12V negative is ground. There may be two (one black on each plug).
 2. **Key off, volts:** 12 V now is the constant 12V feed (powers the ESP32 and the head unit memory).
@@ -30,7 +59,7 @@ Fill in at the cart with a multimeter. Back-probe from the wire side with thin p
 | Plug | Wire color | Hole number | Key off (V) | Key on (V) | Changes when | Switches 12V or GND | Function | Date |
 |---|---|---|---|---|---|---|---|---|
 | 9 pin | orange | | | | | | | |
-| 9 pin | gray/yellow | | | | | | | |
+| 9 pin | green/yellow | | | | | | | |
 | 9 pin | pink | | | | | | | |
 | 9 pin | yellow | | | | | | | |
 | 9 pin | red/blue | | | | | | | |
