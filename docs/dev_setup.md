@@ -97,6 +97,16 @@ Log out and back in after the `usermod` commands so the new groups apply.
 
 Check: `pio --version` works. With the ESP32-S3 plugged into its native USB port, `ls /dev/ttyACM*` shows it.
 
+## Installing the app on the head unit without ADB
+
+The head unit's developer options are locked by a code we do not have yet (its Factory settings code is 8888; change nothing there except a USB or ADB debugging switch, if it has one). Until then, install builds over Wi-Fi from the laptop:
+
+```bash
+python3 -m http.server 8000 --directory android/app/build/outputs/apk/debug
+```
+
+On the head unit, open `http://<laptop IP>:8000/app-debug.apk` in the browser and allow it to install. `hostname -I` on the laptop shows its IP; both must be on the same Wi-Fi. Without ADB, the app keeps its own log and shows it on a debug screen.
+
 ## 6. Claude Code on the laptop
 
 ```bash
