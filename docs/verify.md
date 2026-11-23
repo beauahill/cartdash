@@ -53,8 +53,9 @@ For each digital line also record: switches 12V or switches to ground, voltage, 
 | Function of each of the 14 wires | Meter, worksheet in `docs/pinout.md` | open | `docs/pinout.md` |
 | Which wire is constant 12V, and is it live with the key off | Meter, key off | partial: none found at the screen plugs (2026-11-23) | `docs/pinout.md` |
 | Is there constant 12V anywhere on the cart | Meter at the 12V converter output or fuse block, key off | open | `docs/plan.md` |
-| 9 pin black: 12V ground or pack negative | Volts between the two plug blacks, key on; each against the 12V converter negative | open | `docs/pinout.md` |
-| Is the 12V system isolated from the pack, or does the converter share its negative | Volts and ohms between 12V negative and pack negative, key off | open | `docs/pinout.md` |
+| 9 pin black: 12V ground or pack negative | Volts between the two plug blacks, key on | partial: same ground as the 16 pin black (0 V); confirm with ohms, key off | `docs/pinout.md` |
+| Is the 12V system isolated from the pack, or does the converter share its negative | Ohms, key off, plug black to the controller's B- terminal | likely shared: 68 V and 12 V both read against the same black | `docs/pinout.md` |
+| 16 pin red: switched or constant | Meter, key off and on | done: 12 V with the key on only (switched, ACC) | `docs/pinout.md` |
 | Is there a CAN pair at the screen at all (manual functions outnumber wires by 3) | Two wires at about 2.5 V key on, 60 or 120 ohms between them key off | open | `docs/pinout.md` |
 | CANH to CANL resistance, cart off (60 or 120 ohms) | Meter | open | `docs/pinout.md` |
 | CAN idle voltages, key on (about 2.5 V each) | Meter | open | `docs/pinout.md` |

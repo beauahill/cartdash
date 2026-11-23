@@ -46,7 +46,9 @@ There are 14 wires in all. The manual lists 17 functions apart from speakers (8 
 
 ## Wire identification worksheet
 
-> **High voltage in the screen plugs.** The 9 pin red/blue wire reads 68 V with the key on (2026-11-23): that is traction pack voltage. Keep it taped and away from everything, and never connect it to the head unit, the ESP32, or anything on the 12V side. The 9 pin black may be the pack's negative rather than 12V ground; do not connect it to anything until step 0 says which it is.
+> **High voltage in the screen plugs.** The 9 pin red/blue wire reads 68 V with the key on (2026-11-23): that is traction pack voltage. Keep it taped and away from everything, and never connect it to the head unit, the ESP32, or anything on the 12V side.
+>
+> **Shared negative (likely).** Both blacks are the same ground (0 V between them), and both the 68 V and the 12 V wires measure against it, so the cart's 12V negative is very likely the pack negative: the 12V converter does not isolate. Confirm with ohms, key off, from a plug black to the motor controller's B- terminal (about 0 ohms).
 
 Fill in at the cart with a multimeter, with the factory screen plugged in. Write down where the black meter lead was for every reading. Probing through the rubber seals is hard and can tear them; with the screen's back open, it is easier to touch each wire where it enters the small connectors on the screen's board. One probe at a time, and do not bridge neighboring pins.
 
@@ -66,14 +68,14 @@ Fill in at the cart with a multimeter, with the factory screen plugged in. Write
 | 9 pin | pink | | | | | | | |
 | 9 pin | yellow | | | | | | | |
 | 9 pin | red/blue | | | 68 | | | Pack voltage, key switched (likely the screen's power or "voltage detect"). **High voltage, do not use.** | 2026-11-23 |
-| 9 pin | black | | | | | | | |
-| 16 pin | red | | ? | 12 | | | 12V, key on; key off not yet checked | 2026-11-23 |
+| 9 pin | black | | | 0 to the 16 pin black | | | Ground, same as the 16 pin black (meter reference for these readings) | 2026-11-23 |
+| 16 pin | red | | 0 | 12 | Key | | Switched 12V (ACC for the head unit) | 2026-11-23 |
 | 16 pin | blue | | | | | | | |
 | 16 pin | blue/white | | | | | | | |
 | 16 pin | green | | | | | | | |
 | 16 pin | green/yellow | | | | | | | |
 | 16 pin | light blue | | | | | | | |
-| 16 pin | black | | | | | | | |
+| 16 pin | black | | | 0 to the 9 pin black | | | Ground, same as the 9 pin black | 2026-11-23 |
 | 16 pin | white | | | | | | | |
 
 Hole numbers are molded, very small, into the face of each housing.
