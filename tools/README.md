@@ -74,8 +74,8 @@ This has to happen before the Tianji controller comes out, because the bus goes 
 ## At the cart
 
 1. **Laptop on battery**, not on its charger.
-2. **Wire check** from the brief, with a meter. Record results in `docs/pinout.md`. Also measure CANH and CANL against 16 pin connector pin 1 (ground) with the key on.
-3. **Connect.** Back-probe CANH and CANL on the 9 pin connector with the factory screen still plugged in. Connect the adapter's CAN ground to pin 1 only if CANH and CANL both read about 2.5 V against pin 1. If they do not, stop and write down the readings before connecting any ground.
+2. **Find the wires** with the worksheet in `docs/pinout.md`. The manual's colors do not match this cart, so identify ground and the CAN pair by meter: CANH and CANL are the two wires that sit around 2.5 V against ground with the key on, with 60 or 120 ohms between them with the key off. If no pair behaves like that, stop: there may be no CAN bus at the screen, and the capture plan needs rethinking.
+3. **Connect.** Back-probe CANH and CANL with the factory screen still plugged in. Connect the adapter's CAN ground to the ground wire found in step 2, only if CANH and CANL both read about 2.5 V against it. If they do not, stop and write down the readings before connecting any ground.
 4. **Find the bitrate** with the key on. Nothing is transmitted:
 
    ```bash

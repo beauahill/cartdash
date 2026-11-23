@@ -48,9 +48,11 @@ For each digital line also record: switches 12V or switches to ground, voltage, 
 
 | Item | How to check | Status | Record in |
 |---|---|---|---|
-| 16 pin: pins 1, 2, 3, 4, 9, 10, 11, 12 match the manual | Meter | open | `docs/pinout.md` |
-| 9 pin: which pin is which (manual gives functions, not positions) | Meter, key on, operate each control | open | `docs/pinout.md` |
-| Pin 9 is live with the key off | Meter, key off | open | `docs/pinout.md` |
+| 16 pin: hole count and wires | Look | done: 16 holes, 8 wires; colors do not match the manual | `docs/pinout.md` |
+| 9 pin: hole count and wires | Look | done: 9 holes, 6 wires | `docs/pinout.md` |
+| Function of each of the 14 wires | Meter, worksheet in `docs/pinout.md` | open | `docs/pinout.md` |
+| Which wire is constant 12V, and is it live with the key off | Meter, key off | open | `docs/pinout.md` |
+| Is there a CAN pair at the screen at all (manual functions outnumber wires by 3) | Two wires at about 2.5 V key on, 60 or 120 ohms between them key off | open | `docs/pinout.md` |
 | CANH to CANL resistance, cart off (60 or 120 ohms) | Meter | open | `docs/pinout.md` |
 | CAN idle voltages, key on (about 2.5 V each) | Meter | open | `docs/pinout.md` |
 | Speed pulse: amplitude, push-pull or open collector, pulses per wheel turn, source | Scope or meter | open | `docs/pinout.md` |
