@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Cart Dash, twin gauges</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&amp;family=Barlow:wght@500;600&amp;display=swap">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div style="width: 1000px; height: 600px; box-sizing: border-box; padding: 20px 26px 22px; display: flex; flex-direction: column; gap: 14px; background: {{bg}}; color: {{c.text}}; font-family: 'Barlow', system-ui, sans-serif; overflow: hidden">
+
+<div style="height: 58px; display: flex; align-items: center; justify-content: space-between">
+<svg width="66" height="52" viewBox="0 0 66 52" role="img" aria-label="Left turn signal, off">
+<path d="M4 26 L29 4 L29 16 L62 16 L62 36 L29 36 L29 48 Z" fill="none" stroke="{{c.inactive}}" stroke-width="3" stroke-linejoin="round"></path>
+</svg>
+<div style="display: flex; align-items: center; gap: 26px">
+<div style="display: flex; align-items: center; gap: 8px; color: {{c.dim}}; font-family: 'Barlow Condensed', sans-serif; font-weight: 600; font-size: 20px; letter-spacing: 0.08em">
+<svg width="30" height="22" viewBox="0 0 30 22" aria-hidden="true"><path d="M12 3 C5 3 3 7 3 11 C3 15 5 19 12 19 Z" fill="none" stroke="{{c.text}}" stroke-width="2.2" stroke-linejoin="round"></path><path d="M16 5 L27 3 M16 9 L27 8 M16 13 L27 13 M16 17 L27 18" stroke="{{c.text}}" stroke-width="2.2" stroke-linecap="round"></path></svg>
+<span>LIGHTS</span>
+</div>
+<div style="font-family: 'Barlow Condensed', sans-serif; font-weight: 600; font-size: 34px; font-variant-numeric: tabular-nums">2:41 <span style="font-size: 20px; color: {{c.dim}}">PM</span></div>
+<div style="display: flex; align-items: center; gap: 8px; color: {{c.dim}}; font-family: 'Barlow Condensed', sans-serif; font-weight: 600; font-size: 20px; letter-spacing: 0.08em">
+<span style="width: 10px; height: 10px; border-radius: 5px; background: {{c.green}}"></span>
+<span>LINK</span>
+</div>
+</div>
+<svg width="66" height="52" viewBox="0 0 66 52" role="img" aria-label="Right turn signal, flashing" style="filter: {{arrowGlow}}">
+<path d="M62 26 L37 4 L37 16 L4 16 L4 36 L37 36 L37 48 Z" fill="{{c.green}}" stroke="{{c.green}}" stroke-width="3" stroke-linejoin="round"></path>
+</svg>
+</div>
+
+<div style="flex: 1; min-height: 0; display: flex; align-items: center; justify-content: space-between">
+
+<div style="position: relative; width: 372px; height: 372px">
+<svg width="372" height="372" viewBox="0 0 380 380" role="img" aria-label="Speed 22 miles per hour" style="position: absolute; left: 0; top: 0">
+<defs>
+<linearGradient id="ringSpeed" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="{{c.ring1}}"></stop><stop offset="1" stop-color="{{c.ring2}}"></stop></linearGradient>
+</defs>
+<circle cx="190" cy="190" r="184" fill="{{c.dial}}" stroke="url(#ringSpeed)" stroke-width="6"></circle>
+<circle cx="190" cy="190" r="173" fill="none" stroke="{{c.panelEdge}}" stroke-width="1.5"></circle>
+<path d="{{track}}" fill="none" stroke="{{c.track}}" stroke-width="16" stroke-linecap="round"></path>
+<path d="{{speedArc}}" fill="none" stroke="{{accent}}" stroke-width="16" stroke-linecap="round" style="filter: {{glow}}"></path>
+<path d="{{sMinor}}" fill="none" stroke="{{c.tick}}" stroke-width="2"></path>
+<path d="{{sMajor}}" fill="none" stroke="{{c.text}}" stroke-width="3.5"></path>
+<text x="{{s0.x}}" y="{{s0.y}}" text-anchor="middle" dominant-baseline="central" fill="{{c.dim}}" style="font-family: 'Barlow Condensed', sans-serif; font-weight: 600; font-size: 22px">0</text>
+<text x="{{s5.x}}" y="{{s5.y}}" text-anchor="middle" dominant-baseline="central" fill="{{c.dim}}" style="font-family: 'Barlow Condensed', sans-serif; font-weight: 600; font-size: 22px">5</text>
+<text x="{{s10.x}}" y="{{s10.y}}" text-anchor="middle" dominant-baseline="central" fill="{{c.dim}}" style="font-family: 'Barlow Condensed', sans-serif; font-weight: 600; font-size: 22px">10</text>
+<text x="{{s15.x}}" y="{{s15.y}}" text-anchor="middle" dominant-baseline="central" fill="{{c.dim}}" style="font-family: 'Barlow Condensed', sans-serif; font-weight: 600; font-size: 22px">15</text>
+<text x="{{s20.x}}" y="{{s20.y}}" text-anchor="middle" dominant-baseline="central" fill="{{c.dim}}" style="font-family: 'Barlow Condensed', sans-serif; font-weight: 600; font-size: 22px">20</text>
+<text x="{{s25.x}}" y="{{s25.y}}" text-anchor="middle" dominant-baseline="central" fill="{{c.dim}}" style="font-family: 'Barlow Condensed', sans-serif; font-weight: 600; font-size: 22px">25</text>
+<text x="{{s30.x}}" y="{{s30.y}}" text-anchor="middle" dominant-baseline="central" fill="{{c.dim}}" style="font-family: 'Barlow Condensed', sans-serif; font-weight: 600; font-size: 22px">30</text>
+<text x="{{s35.x}}" y="{{s35.y}}" text-anchor="middle" dominant-baseline="central" fill="{{c.dim}}" style="font-family: 'Barlow Condensed', sans-serif; font-weight: 600; font-size: 22px">35</text>
+<text x="{{s40.x}}" y="{{s40.y}}" text-anchor="middle" dominant-baseline="central" fill="{{c.dim}}" style="font-family: 'Barlow Condensed', sans-serif; font-weight: 600; font-size: 22px">40</text>
+<text x="{{s45.x}}" y="{{s45.y}}" text-anchor="middle" dominant-baseline="central" fill="{{c.dim}}" style="font-family: 'Barlow Condensed', sans-serif; font-weight: 600; font-size: 22px">45</text>
+</svg>
+<div style="position: absolute; left: 0; top: 0; width: 372px; height: 372px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding-top: 6px; box-sizing: border-box">
+<div style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 150px; line-height: 0.86; font-variant-numeric: tabular-nums">22</div>
+<div style="font-family: 'Barlow Condensed', sans-serif; font-weight: 600; font-size: 24px; letter-spacing: 0.16em; color: {{c.dim}}; margin-top: 6px">MPH</div>
+</div>
+<div style="position: absolute; left: 136px; bottom: 30px; width: 100px; text-align: center; font-family: 'Barlow Condensed', sans-serif; font-weight: 600; font-size: 17px; letter-spacing: 0.12em; color: {{accent}}">HIGH</div>
+</div>
+
+<div style="width: 168px; display: flex; flex-direction: column; align-items: center; gap: 26px">
+<div style="display: flex; flex-direction: column; gap: 8px">
+<div style="width: 84px; height: 58px; border-radius: 12px; background: {{accent}}; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 40px; box-shadow: 0 0 18px {{gearGlow}}">F</div>
+<div style="width: 84px; height: 58px; border-radius: 12px; box-sizing: border-box; border: 2px solid {{c.panelEdge}}; color: {{c.dim}}; display: flex; align-items: center; justify-content: center; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 36px">N</div>
+<div style="width: 84px; height: 58px; border-radius: 12px; box-sizing: border-box; border: 2px solid {{c.panelEdge}}; color: {{c.dim}}; display: flex; align-items: center; justify-content: center; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 36px">R</div>
+</div>
+<div style="display: flex; flex-direction: column; align-items: center; gap: 6px">
+<div style="font-family: 'Barlow Condensed', sans-serif; font-weight: 600; font-size: 17px; letter-spacing: 0.14em; color: {{c.dim}}">USING</div>
+<div style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 46px; line-height: 1; font-variant-numeric: tabular-nums">3.2 <span style="font-size: 24px; color: {{c.dim}}">kW</span></div>
+<div style="position: relative; width: 150px; height: 10px; border-radius: 5px; background: {{c.track}}; margin-top: 6px">
+<div style="position: absolute; left: 75px; top: 0; width: 46px; height: 10px; border-radius: 0 5px 5px 0; background: {{accent}}"></div>
+<div style="position: absolute; left: 74px; top: -4px; width: 2px; height: 18px; background: {{c.text}}"></div>
+</div>
+<div style="width: 150px; display: flex; justify-content: space-between; font-family: 'Barlow Condensed', sans-serif; font-weight: 600; font-size: 14px; letter-spacing: 0.1em; color: {{c.dim}}"><span>REGEN</span><span>POWER</span></div>
+</div>
+</div>
+
+<div style="position: relative; width: 372px; height: 372px">
+<svg width="372" height="372" viewBox="0 0 380 380" role="img" aria-label="Battery 82 percent" style="position: absolute; left: 0; top: 0">
+<defs>
+<linearGradient id="ringBattery" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="{{c.ring1}}"></stop><stop offset="1" stop-color="{{c.ring2}}"></stop></linearGradient>
+</defs>
+<circle cx="190" cy="190" r="184" fill="{{c.dial}}" stroke="url(#ringBattery)" stroke-width="6"></circle>
+<circle cx="190" cy="190" r="173" fill="none" stroke="{{c.panelEdge}}" stroke-width="1.5"></circle>
+<path d="{{track}}" fill="none" stroke="{{c.track}}" stroke-width="16" stroke-linecap="round"></path>
+<path d="{{socArc}}" fill="none" stroke="{{accent}}" stroke-width="16" stroke-linecap="round" style="filter: {{glow}}"></path>
+<path d="{{bMinor}}" fill="none" stroke="{{c.tick}}" stroke-width="2"></path>
+<path d="{{bMajor}}" fill="none" stroke="{{c.text}}" stroke-width="3.5"></path>
+<text x="{{bE.x}}" y="{{bE.y}}" text-anchor="middle" dominant-baseline="central" fill="{{c.dim}}" style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 24px">E</text>
+<text x="{{bH.x}}" y="{{bH.y}}" text-anchor="middle" dominant-baseline="central" fill="{{c.dim}}" style="font-family: 'Barlow Condensed', sans-serif; font-weight: 600; font-size: 22px">50</text>
+<text x="{{bF.x}}" y="{{bF.y}}" text-anchor="middle" dominant-baseline="central" fill="{{c.dim}}" style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 24px">F</text>
+</svg>
+<div style="position: absolute; left: 0; top: 0; width: 372px; height: 372px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding-top: 6px; box-sizing: border-box">
+<div style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 150px; line-height: 0.86; font-variant-numeric: tabular-nums">82<span style="font-size: 60px">%</span></div>
+<div style="font-family: 'Barlow Condensed', sans-serif; font-weight: 600; font-size: 24px; letter-spacing: 0.12em; color: {{c.dim}}; margin-top: 6px">31 MI RANGE</div>
+</div>
+<div style="position: absolute; left: 136px; bottom: 30px; width: 100px; text-align: center; font-family: 'Barlow Condensed', sans-serif; font-weight: 600; font-size: 17px; letter-spacing: 0.1em; color: {{c.dim}}">66.4 V</div>
+</div>
+
+</div>
+
+<div style="height: 92px; display: flex; gap: 12px">
+<div style="flex: 1; min-width: 0; box-sizing: border-box; padding: 12px 16px; border-radius: 14px; background: {{c.panel}}; border: 1px solid {{c.panelEdge}}; box-shadow: inset 0 1px 0 {{c.panelHi}}; display: flex; flex-direction: column; justify-content: center; gap: 2px">
+<div style="font-family: 'Barlow Condensed', sans-serif; font-weight: 600; font-size: 15px; letter-spacing: 0.14em; color: {{c.dim}}">MOTOR</div>
+<div style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 34px; line-height: 1; font-variant-numeric: tabular-nums">121<span style="font-size: 20px; color: {{c.dim}}"> °F</span></div>
+</div>
+<div style="flex: 1; min-width: 0; box-sizing: border-box; padding: 12px 16px; border-radius: 14px; background: {{c.panel}}; border: 1px solid {{c.panelEdge}}; box-shadow: inset 0 1px 0 {{c.panelHi}}; display: flex; flex-direction: column; justify-content: center; gap: 2px">
+<div style="font-family: 'Barlow Condensed', sans-serif; font-weight: 600; font-size: 15px; letter-spacing: 0.14em; color: {{c.dim}}">CONTROLLER</div>
+<div style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 34px; line-height: 1; font-variant-numeric: tabular-nums">104<span style="font-size: 20px; color: {{c.dim}}"> °F</span></div>
+</div>
+<div style="flex: 1; min-width: 0; box-sizing: border-box; padding: 12px 16px; border-radius: 14px; background: {{c.panel}}; border: 1px solid {{c.panelEdge}}; box-shadow: inset 0 1px 0 {{c.panelHi}}; display: flex; flex-direction: column; justify-content: center; gap: 2px">
+<div style="font-family: 'Barlow Condensed', sans-serif; font-weight: 600; font-size: 15px; letter-spacing: 0.14em; color: {{c.dim}}">CELLS</div>
+<div style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 34px; line-height: 1; font-variant-numeric: tabular-nums">3.31<span style="font-size: 20px; color: {{c.dim}}"> to </span>3.32</div>
+</div>
+<div style="flex: 1; min-width: 0; box-sizing: border-box; padding: 12px 16px; border-radius: 14px; background: {{c.panel}}; border: 1px solid {{c.panelEdge}}; box-shadow: inset 0 1px 0 {{c.panelHi}}; display: flex; flex-direction: column; justify-content: center; gap: 2px">
+<div style="font-family: 'Barlow Condensed', sans-serif; font-weight: 600; font-size: 15px; letter-spacing: 0.14em; color: {{c.dim}}">TRIP</div>
+<div style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 34px; line-height: 1; font-variant-numeric: tabular-nums">4.2<span style="font-size: 20px; color: {{c.dim}}"> mi</span></div>
+</div>
+<button type="button" style="width: 92px; box-sizing: border-box; border-radius: 14px; background: {{c.panel}}; border: 1px solid {{c.panelEdge}}; box-shadow: inset 0 1px 0 {{c.panelHi}}; color: {{c.text}}; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; padding: 0; cursor: pointer">
+<svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><rect x="8" y="3" width="14" height="24" rx="3" fill="none" stroke="{{accent}}" stroke-width="2.4"></rect><path d="M13 23 L17 23" stroke="{{accent}}" stroke-width="2.4" stroke-linecap="round"></path></svg>
+<span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 600; font-size: 15px; letter-spacing: 0.1em">CARPLAY</span>
+</button>
+<button type="button" style="width: 92px; box-sizing: border-box; border-radius: 14px; background: {{c.panel}}; border: 1px solid {{c.panelEdge}}; box-shadow: inset 0 1px 0 {{c.panelHi}}; color: {{c.text}}; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; padding: 0; cursor: pointer">
+<svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><path d="M9 27 L9 3 L23 8 L9 13" fill="none" stroke="{{accent}}" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"></path><path d="M5 27 L15 27" stroke="{{accent}}" stroke-width="2.4" stroke-linecap="round"></path></svg>
+<span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 600; font-size: 15px; letter-spacing: 0.1em">COURSE</span>
+</button>
+<button type="button" style="width: 92px; box-sizing: border-box; border-radius: 14px; background: {{c.panel}}; border: 1px solid {{c.panelEdge}}; box-shadow: inset 0 1px 0 {{c.panelHi}}; color: {{c.text}}; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; padding: 0; cursor: pointer">
+<svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><path d="M5 8 L25 8 M5 15 L25 15 M5 22 L25 22" stroke="{{accent}}" stroke-width="2.4" stroke-linecap="round"></path></svg>
+<span style="font-family: 'Barlow Condensed', sans-serif; font-weight: 600; font-size: 15px; letter-spacing: 0.1em">MENU</span>
+</button>
+</div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"accent":{"editor":"color","default":"#E3262F","options":["#E3262F","#C8102E","#2D8CFF","#0A5FD6"]},"day":{"editor":"boolean","default":false},"$preview":{"width":1000,"height":600}}'>
+function polar(cx, cy, r, a) {
+  var t = a * Math.PI / 180;
+  return [cx + r * Math.cos(t), cy + r * Math.sin(t)];
+}
+function f1(n) { return n.toFixed(1); }
+function arcPath(cx, cy, r, a0, a1) {
+  var p0 = polar(cx, cy, r, a0), p1 = polar(cx, cy, r, a1);
+  var large = (a1 - a0) > 180 ? 1 : 0;
+  return 'M ' + f1(p0[0]) + ' ' + f1(p0[1]) + ' A ' + r + ' ' + r + ' 0 ' + large + ' 1 ' + f1(p1[0]) + ' ' + f1(p1[1]);
+}
+function tickPaths(cx, cy, rOut, steps, a0, sweep, majorEvery, minorLen, majorLen) {
+  var minor = '', major = '';
+  for (var i = 0; i <= steps; i++) {
+    var a = a0 + sweep * i / steps;
+    var isMajor = i % majorEvery === 0;
+    var p0 = polar(cx, cy, rOut, a), p1 = polar(cx, cy, rOut - (isMajor ? majorLen : minorLen), a);
+    var seg = 'M ' + f1(p0[0]) + ' ' + f1(p0[1]) + ' L ' + f1(p1[0]) + ' ' + f1(p1[1]) + ' ';
+    if (isMajor) { major += seg; } else { minor += seg; }
+  }
+  return { minor: minor, major: major };
+}
+function labelAt(cx, cy, r, a) {
+  var p = polar(cx, cy, r, a);
+  return { x: f1(p[0]), y: f1(p[1]) };
+}
+class Component extends DCLogic {
+  renderVals() {
+    var accent = this.props.accent ?? '#E3262F';
+    var day = this.props.day ?? false;
+    var c = day
+      ? { bg: '#E9ECF0', bg2: '#F7F8FA', panel: '#FFFFFF', panelEdge: '#C6CBD3', panelHi: '#FFFFFF', dial: '#FFFFFF', text: '#0B0C0E', dim: '#4A505A', track: '#DCE0E6', tick: '#7A808A', ring1: '#FFFFFF', ring2: '#9AA1AB', green: '#0E9F4F', inactive: '#B6BCC5' }
+      : { bg: '#08090B', bg2: '#16181C', panel: '#121418', panelEdge: '#2B2F36', panelHi: 'rgba(255,255,255,0.07)', dial: '#0E1013', text: '#F3F5F8', dim: '#9097A1', track: '#24272D', tick: '#6E747E', ring1: '#6A707A', ring2: '#1A1C20', green: '#2BD96B', inactive: '#3A3F47' };
+    var speed = 22, maxSpeed = 45, soc = 82;
+    var A0 = 135, SW = 270, CX = 190, CY = 190, R = 150;
+    var sTicks = tickPaths(CX, CY, 130, 45, A0, SW, 5, 6, 16);
+    var bTicks = tickPaths(CX, CY, 130, 10, A0, SW, 5, 8, 16);
+    var lab = function (v, max) { return labelAt(CX, CY, 102, A0 + SW * v / max); };
+    return {
+      accent: accent,
+      c: c,
+      bg: 'linear-gradient(180deg, ' + c.bg2 + ' 0%, ' + c.bg + ' 60%)',
+      track: arcPath(CX, CY, R, A0, A0 + SW),
+      speedArc: arcPath(CX, CY, R, A0, A0 + SW * speed / maxSpeed),
+      socArc: arcPath(CX, CY, R, A0, A0 + SW * soc / 100),
+      sMinor: sTicks.minor, sMajor: sTicks.major,
+      bMinor: bTicks.minor, bMajor: bTicks.major,
+      s0: lab(0, 45), s5: lab(5, 45), s10: lab(10, 45), s15: lab(15, 45), s20: lab(20, 45), s25: lab(25, 45), s30: lab(30, 45), s35: lab(35, 45), s40: lab(40, 45), s45: lab(45, 45),
+      bE: lab(0, 100), bH: lab(50, 100), bF: lab(100, 100),
+      glow: day ? 'none' : 'drop-shadow(0 0 7px ' + accent + ')',
+      arrowGlow: day ? 'none' : 'drop-shadow(0 0 8px ' + c.green + ')',
+      gearGlow: day ? 'rgba(0,0,0,0)' : accent
+    };
+  }
+}
+</script>
+</body>
+</html>

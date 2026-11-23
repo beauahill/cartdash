@@ -20,6 +20,7 @@ The brief is `README.md`. This file tracks the order of work, status, and decisi
 | 2026-11-23 | Firmware platform pinned to espressif32 8.0.0, which is Arduino core 3.3.12 (ESP-IDF 5.x APIs for TWAI, PCNT, and sleep). JSON with ArduinoJson 7.4.2. Serial is the S3's built-in USB Serial/JTAG port (`ARDUINO_USB_MODE=1`, `ARDUINO_USB_CDC_ON_BOOT=1`), core debug output off. |
 | 2026-11-23 | Android data layer: `DataSource` emits raw JSON lines, not `Flow<CartState>` as the brief's layout says, and `CartLink` does the parsing and link status for every source. That way Sim, TCP, and USB all go through the same parser and the same 1 s link timer, and link status counts every line, not just `state`. `CartLink` lives in the Application until `LinkService` takes it over in Phase 1. Firmware files beyond the brief's layout: `protocol.cpp` (JSON out, line reader, cmd handling), `logic.cpp` (blinker latch, speed math), `config_store.cpp` (NVS), `host_main.cpp` (laptop stream). |
 | 2026-11-23 | Android toolchain: AGP 9.5.2, Kotlin 2.4.21, Gradle 9.9.2, JDK 17. compileSdk is 37.2 because the current Compose libraries require it; minSdk stays 31. Package `com.cartdash`. JSON with kotlinx.serialization, parsed to `JsonObject` and type checked by hand, so the receiver rules match `tools/cartdash_proto.py`. |
+| 2026-11-23 | Dash look, chosen from mockups: layout A (twin round gauges) for the drive dash, layout C for the course screen, blue accent, Barlow Condensed numerals, speedometer 0 to 45 mph, night theme while the headlights are on. Red and amber are kept for warnings only. Spec: `docs/dash_design.md`. |
 
 ## Hardware status
 
@@ -170,7 +171,7 @@ G2, yardage engine and course screen (emulator):
   - Smoothing, plus averaging every fix while the ESP32 reports speed 0, so numbers hold still when parked by the ball.
   - Accuracy gate: dim the numbers and show the accuracy when it is worse than about 10 yards.
 - `LocationSource` with `ReplayLocation`: replays GPX tracks, or drives a simulated round along each hole's line of play, so the emulator shows real course data moving.
-- `CourseScreen`: hole drawn tee at the bottom and green at the top, cart dot, huge front, center, back numbers, hole and par, previous and next buttons, a compact strip with speed, SOC, blinkers, and warnings. Readable in sun: thick shapes, high contrast colors, no thin lines.
+- `CourseScreen`: hole drawn tee at the bottom and green at the top, cart dot, huge front, center, back numbers, hole and par, previous and next buttons, a compact strip with speed, SOC, blinkers, and warnings. Readable in sun: thick shapes, high contrast colors, no thin lines. Look: layout C in `docs/dash_design.md`.
 - Two views with a toggle that is remembered: **Drawn** (shapes from the course file) and **Photo** (the aerial photo, rotated the same way, with the green outline, cart dot, and yardage drawn on top). Photo view falls back to Drawn when a course has no imagery file.
 - The course screen appears automatically inside a course boundary. The overlay shows center yardage over CarPlay.
 
@@ -180,9 +181,19 @@ G3, on the real head unit:
 - [ ] Accuracy: park at about 20 sprinkler heads or 150 yard markers with known yardage to center and record the error in `docs/verify.md`. Typical head unit GPS is within 3 to 5 yards in open sky; trees make it worse.
 - [ ] Target is 3 to 5 yards. Only if it comes out worse: add a dual band (L1 and L5) GNSS module to the ESP32 on a spare UART, send `lat`, `lon`, and `gps_acc_m` as new optional `state` fields (no protocol version change), and add an `EspGnss` location source.
 
+### Track D: Dash look (app only, any time)
+
+Restyle the app to `docs/dash_design.md`. Nothing here needs cart hardware.
+- [ ] Bundle Barlow Condensed and Barlow in `res/font/` with the OFL license file. Confirm tabular digits keep the speed number from shifting sideways.
+- [ ] Theme tokens for night and day from the spec, the accent glow at night, and the theme override (Auto, Day, Night).
+- [ ] Drive dash, layout A: top bar with signal lights, clock, SIM chip and the single most severe banner; speed dial 0 to 45 mph; center column with gear stack and power bar; battery dial with the SOC color steps; bottom row of four tiles and the CARPLAY, COURSE, and MENU buttons.
+- [ ] Menu: data source, theme, firmware version, the screen readout (`densityDpi`, px and dp size, `u` in px) for the density VERIFY item, and the last 200 `log` lines from the ESP32 for debugging while ADB is locked.
+- [ ] Check in the emulator on every `fake_esp.py` scenario, in both themes, including the cases not yet captured: left blinker, gear R, park brake, SOC under 30% and under 15%, and a `--` in every field.
+- The course screen's look (layout C) is built with `CourseScreen` in Track G2.
+
 ### Phase 6: Android polish
 - Overlay: a Compose view in an overlay window needs its lifecycle and saved state owners set by hand. Confirm on the real unit that it draws over the CarPlay app.
 - Speed calibration: with GPS available, the app can compare GPS speed to the reported speed on a straight run and suggest the tire diameter or gear ratio.
 - CarPlay app picker: Android 11 and later need a `<queries>` entry for launcher intents, or the app list comes back nearly empty.
-- Trips are computed in `LinkService`, not the UI. Skip gaps longer than 1 s. Save about every 10 s. Range estimate is SOC times about 8.3 kWh divided by recent Wh per mile.
+- Trips are computed in `LinkService`, not the UI. Skip gaps longer than 1 s. Save about every 10 s. Range estimate is SOC times about 8.3 kWh divided by recent Wh per mile. Trip and range fill the spots marked Phase 6 in `docs/dash_design.md`.
 - Test day and night themes outside in direct sun. A light background often reads better on a glossy screen than a dark one.

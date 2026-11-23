@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Cart Dash, course screen</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&amp;family=Barlow:wght@500;600&amp;display=swap">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div style="width: 1000px; height: 600px; box-sizing: border-box; padding: 16px 22px 18px; display: flex; flex-direction: column; gap: 12px; background: {{bg}}; color: {{c.text}}; font-family: 'Barlow', system-ui, sans-serif; overflow: hidden">
+
+<div style="height: 44px; display: flex; align-items: center; justify-content: space-between">
+<div style="display: flex; align-items: center; gap: 18px">
+<svg width="46" height="36" viewBox="0 0 66 52" role="img" aria-label="Left turn signal, off">
+<path d="M4 26 L29 4 L29 16 L62 16 L62 36 L29 36 L29 48 Z" fill="none" stroke="{{c.inactive}}" stroke-width="3.5" stroke-linejoin="round"></path>
+</svg>
+<div style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 34px; line-height: 1; font-variant-numeric: tabular-nums">0 <span style="font-size: 17px; font-weight: 600; letter-spacing: 0.12em; color: {{c.dim}}">MPH</span></div>
+<div style="width: 34px; height: 30px; border-radius: 7px; background: {{accent}}; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 22px">F</div>
+</div>
+<div style="font-family: 'Barlow Condensed', sans-serif; font-weight: 600; font-size: 30px; font-variant-numeric: tabular-nums">2:41 <span style="font-size: 18px; color: {{c.dim}}">PM</span></div>
+<div style="display: flex; align-items: center; gap: 18px">
+<div style="display: flex; align-items: center; gap: 10px">
+<div style="position: relative; width: 56px; height: 14px; border-radius: 4px; background: {{c.track}}; overflow: hidden">
+<div style="position: absolute; left: 0; top: 0; width: 46px; height: 14px; background: {{accent}}"></div>
+</div>
+<div style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 30px; line-height: 1; font-variant-numeric: tabular-nums">82<span style="font-size: 17px; color: {{c.dim}}">%</span></div>
+</div>
+<svg width="46" height="36" viewBox="0 0 66 52" role="img" aria-label="Right turn signal, off">
+<path d="M62 26 L37 4 L37 16 L4 16 L4 36 L37 36 L37 48 Z" fill="none" stroke="{{c.inactive}}" stroke-width="3.5" stroke-linejoin="round"></path>
+</svg>
+</div>
+</div>
+
+<div style="flex: 1; min-height: 0; display: flex; gap: 18px">
+
+<div style="position: relative; width: 540px; height: 510px; border-radius: 16px; overflow: hidden; border: 1px solid {{c.panelEdge}}; box-sizing: border-box">
+<svg width="540" height="510" viewBox="0 0 540 510" role="img" aria-label="Drawn map of hole 7 with the cart position and the green" style="position: absolute; left: -1px; top: -1px">
+<rect x="0" y="0" width="540" height="510" fill="{{m.rough}}"></rect>
+<circle cx="60" cy="92" r="27" fill="{{m.tree}}"></circle>
+<circle cx="102" cy="58" r="22" fill="{{m.tree}}"></circle>
+<circle cx="66" cy="146" r="20" fill="{{m.tree}}"></circle>
+<circle cx="430" cy="38" r="20" fill="{{m.tree}}"></circle>
+<circle cx="476" cy="92" r="25" fill="{{m.tree}}"></circle>
+<circle cx="444" cy="204" r="28" fill="{{m.tree}}"></circle>
+<circle cx="480" cy="252" r="23" fill="{{m.tree}}"></circle>
+<circle cx="420" cy="290" r="19" fill="{{m.tree}}"></circle>
+<circle cx="486" cy="420" r="30" fill="{{m.tree}}"></circle>
+<circle cx="440" cy="468" r="22" fill="{{m.tree}}"></circle>
+<circle cx="92" cy="362" r="26" fill="{{m.tree}}"></circle>
+<circle cx="58" cy="414" r="22" fill="{{m.tree}}"></circle>
+<circle cx="120" cy="440" r="18" fill="{{m.tree}}"></circle>
+<path d="M 92 206 C 90 176 138 164 160 188 C 182 212 164 254 126 252 C 102 250 93 230 92 206 Z" fill="{{m.water}}"></path>
+<path d="M 205 400 C 195 310 205 245 250 200 S 310 140 320 112" fill="none" stroke="{{m.fairway}}" stroke-width="74" stroke-linecap="round"></path>
+<path d="M 205 400 C 195 310 205 245 250 200 S 310 140 320 112" fill="none" stroke="{{m.stripe}}" stroke-width="74" stroke-dasharray="24 24"></path>
+<ellipse cx="270" cy="240" rx="20" ry="11" transform="rotate(-35 270 240)" fill="{{m.bunker}}"></ellipse>
+<ellipse cx="322" cy="90" rx="57" ry="44" transform="rotate(-20 322 90)" fill="{{m.fairway}}"></ellipse>
+<ellipse cx="322" cy="90" rx="48" ry="36" transform="rotate(-20 322 90)" fill="{{m.green}}"></ellipse>
+<ellipse cx="262" cy="106" rx="17" ry="11" transform="rotate(30 262 106)" fill="{{m.bunker}}"></ellipse>
+<ellipse cx="380" cy="62" rx="16" ry="10" transform="rotate(-30 380 62)" fill="{{m.bunker}}"></ellipse>
+<ellipse cx="364" cy="130" rx="14" ry="9" transform="rotate(-10 364 130)" fill="{{m.bunker}}"></ellipse>
+<rect x="186" y="430" width="36" height="18" rx="6" fill="{{m.tee}}"></rect>
+<rect x="192" y="458" width="30" height="16" rx="6" fill="{{m.tee}}"></rect>
+<path d="M 215 330 L 322 90" fill="none" stroke="{{m.line}}" stroke-width="2.5" stroke-dasharray="7 8" stroke-linecap="round"></path>
+<circle cx="309" cy="122" r="6" fill="{{m.dot}}" stroke="{{m.dotEdge}}" stroke-width="2"></circle>
+<circle cx="335" cy="58" r="6" fill="{{m.dot}}" stroke="{{m.dotEdge}}" stroke-width="2"></circle>
+<circle cx="322" cy="90" r="8" fill="{{accent}}" stroke="{{m.dot}}" stroke-width="2.5"></circle>
+<text x="293" y="128" text-anchor="end" fill="{{m.dot}}" style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 15px">F</text>
+<text x="349" y="54" text-anchor="start" fill="{{m.dot}}" style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 15px">B</text>
+<circle cx="215" cy="330" r="24" fill="{{accent}}" opacity="0.25"></circle>
+<circle cx="215" cy="330" r="10" fill="{{accent}}" stroke="#FFFFFF" stroke-width="4"></circle>
+<text x="528" y="500" text-anchor="end" fill="{{m.note}}" style="font-family: 'Barlow', sans-serif; font-weight: 500; font-size: 11px">© OpenStreetMap contributors</text>
+</svg>
+<div style="position: absolute; left: 14px; top: 14px; padding: 6px 12px; border-radius: 8px; background: {{m.chip}}; color: {{c.text}}; font-family: 'Barlow Condensed', sans-serif; font-weight: 600; font-size: 16px; letter-spacing: 0.1em">BELL NOB · BLACK TEES</div>
+</div>
+
+<div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 12px">
+
+<div style="height: 90px; display: flex; align-items: flex-end; justify-content: space-between">
+<div style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 68px; line-height: 0.9">HOLE 7</div>
+<div style="display: flex; flex-direction: column; align-items: flex-end; gap: 2px; font-family: 'Barlow Condensed', sans-serif; font-weight: 600; letter-spacing: 0.08em; color: {{c.dim}}">
+<div style="font-size: 26px; color: {{c.text}}">PAR 5</div>
+<div style="font-size: 18px">564 YD · HCP 1</div>
+</div>
+</div>
+
+<div style="flex: 1; min-height: 0; display: flex; flex-direction: column; border-radius: 16px; background: {{c.panel}}; border: 1px solid {{c.panelEdge}}; box-shadow: inset 0 1px 0 {{c.panelHi}}; overflow: hidden">
+<div style="height: 78px; box-sizing: border-box; padding: 0 22px; display: flex; align-items: center; justify-content: space-between">
+<div style="font-family: 'Barlow Condensed', sans-serif; font-weight: 600; font-size: 19px; letter-spacing: 0.16em; color: {{c.dim}}">BACK</div>
+<div style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 58px; line-height: 1; font-variant-numeric: tabular-nums">170</div>
+</div>
+<div style="height: 1px; background: {{c.panelEdge}}"></div>
+<div style="position: relative; flex: 1; box-sizing: border-box; padding: 0 22px; display: flex; align-items: center; justify-content: space-between">
+<div style="position: absolute; left: 0; top: 18px; bottom: 18px; width: 5px; border-radius: 0 3px 3px 0; background: {{accent}}"></div>
+<div style="display: flex; flex-direction: column; gap: 4px">
+<div style="font-family: 'Barlow Condensed', sans-serif; font-weight: 600; font-size: 21px; letter-spacing: 0.16em; color: {{accent}}">CENTER</div>
+<div style="font-family: 'Barlow Condensed', sans-serif; font-weight: 600; font-size: 17px; letter-spacing: 0.12em; color: {{c.dim}}">YARDS</div>
+</div>
+<div style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 150px; line-height: 0.86; font-variant-numeric: tabular-nums; color: {{accent}}; text-shadow: {{numGlow}}">152</div>
+</div>
+<div style="height: 1px; background: {{c.panelEdge}}"></div>
+<div style="height: 78px; box-sizing: border-box; padding: 0 22px; display: flex; align-items: center; justify-content: space-between">
+<div style="font-family: 'Barlow Condensed', sans-serif; font-weight: 600; font-size: 19px; letter-spacing: 0.16em; color: {{c.dim}}">FRONT</div>
+<div style="font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 58px; line-height: 1; font-variant-numeric: tabular-nums">131</div>
+</div>
+</div>
+
+<div style="height: 60px; display: flex; gap: 12px">
+<button type="button" aria-label="Previous hole" style="width: 72px; box-sizing: border-box; border-radius: 14px; background: {{c.panel}}; border: 1px solid {{c.panelEdge}}; box-shadow: inset 0 1px 0 {{c.panelHi}}; display: flex; align-items: center; justify-content: center; padding: 0; cursor: pointer">
+<svg width="26" height="26" viewBox="0 0 26 26" aria-hidden="true"><path d="M17 4 L8 13 L17 22" fill="none" stroke="{{c.text}}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+</button>
+<div style="flex: 1; display: flex; box-sizing: border-box; padding: 5px; gap: 5px; border-radius: 14px; background: {{c.panel}}; border: 1px solid {{c.panelEdge}}">
+<button type="button" style="flex: 1; border: none; border-radius: 10px; background: {{accent}}; color: #FFFFFF; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 19px; letter-spacing: 0.12em; cursor: pointer">DRAWN</button>
+<button type="button" style="flex: 1; border: none; border-radius: 10px; background: transparent; color: {{c.dim}}; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 19px; letter-spacing: 0.12em; cursor: pointer">PHOTO</button>
+</div>
+<button type="button" aria-label="Next hole" style="width: 72px; box-sizing: border-box; border-radius: 14px; background: {{c.panel}}; border: 1px solid {{c.panelEdge}}; box-shadow: inset 0 1px 0 {{c.panelHi}}; display: flex; align-items: center; justify-content: center; padding: 0; cursor: pointer">
+<svg width="26" height="26" viewBox="0 0 26 26" aria-hidden="true"><path d="M9 4 L18 13 L9 22" fill="none" stroke="{{c.text}}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+</button>
+</div>
+
+</div>
+</div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"accent":{"editor":"color","default":"#E3262F","options":["#E3262F","#C8102E","#2D8CFF","#0A5FD6"]},"day":{"editor":"boolean","default":false},"$preview":{"width":1000,"height":600}}'>
+class Component extends DCLogic {
+  renderVals() {
+    var accent = this.props.accent ?? '#E3262F';
+    var day = this.props.day ?? false;
+    var c = day
+      ? { bg: '#E9ECF0', bg2: '#F7F8FA', panel: '#FFFFFF', panelEdge: '#C6CBD3', panelHi: '#FFFFFF', text: '#0B0C0E', dim: '#4A505A', track: '#DCE0E6', inactive: '#B6BCC5' }
+      : { bg: '#08090B', bg2: '#16181C', panel: '#121418', panelEdge: '#2B2F36', panelHi: 'rgba(255,255,255,0.07)', text: '#F3F5F8', dim: '#9097A1', track: '#24272D', inactive: '#3A3F47' };
+    var m = day
+      ? { rough: '#CFE3C0', tree: '#A6CB95', fairway: '#8FC97A', stripe: 'rgba(255,255,255,0.18)', green: '#5DB65A', bunker: '#EFE2B5', water: '#6FA8DC', tee: '#74B866', line: '#0B0C0E', dot: '#FFFFFF', dotEdge: '#0B0C0E', note: 'rgba(0,0,0,0.55)', chip: 'rgba(255,255,255,0.85)' }
+      : { rough: '#16231A', tree: '#0E1811', fairway: '#2E5E37', stripe: 'rgba(255,255,255,0.05)', green: '#3E9B4C', bunker: '#CDBB8A', water: '#1F5A96', tee: '#3A7A45', line: '#F3F5F8', dot: '#F3F5F8', dotEdge: '#08090B', note: 'rgba(255,255,255,0.55)', chip: 'rgba(8,9,11,0.72)' };
+    return {
+      accent: accent,
+      c: c,
+      m: m,
+      bg: 'linear-gradient(180deg, ' + c.bg2 + ' 0%, ' + c.bg + ' 60%)',
+      numGlow: day ? 'none' : '0 0 22px ' + accent
+    };
+  }
+}
+</script>
+</body>
+</html>
