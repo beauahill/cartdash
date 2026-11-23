@@ -8,7 +8,7 @@ Both are sealed connectors (a yellow rubber seal on each wire). The colors are t
 
 > **High voltage: 9 pin hole 8 (red/blue) carries traction pack voltage, 68 V with the key on.** Keep it taped and away from everything. Never connect it to the head unit, the ESP32, or anything on the 12V side.
 >
-> **Shared negative (likely).** Both blacks are the same ground, and the 68 V and the 12 V both read against it, so the cart's 12V negative is very likely the pack negative. Two checks, each in one place: (1) at the 12V converter, key off, ohms between its input negative and output negative (about 0 ohms means shared, open means an isolated converter); (2) at the dash with the screen unplugged, key on, volts between the harness red/blue and black (still 68 V means the harness ties them; 0 V means the screen's board was doing it, and the bond leaves with the screen).
+> **Shared negative (confirmed at the harness, 2026-11-23).** With the factory screen unplugged, the harness red/blue still reads 68 V to the black, so the harness itself ties that black to pack negative. The two plug blacks read 0 V apart, and the 12 V reads against the same black, so the cart's 12V system shares the pack negative. The last word would be ohms between the 12V converter's input and output negatives, key off; it only matters when choosing an always-on converter (`docs/plan.md`, power question).
 
 **Which half the new plugs must be.** The screen-side half is the one with a deep square shroud, terminals recessed inside, and a yellow comb across the face (`photos/factory-screen-9pin-face.jpg`, `photos/factory-screen-16pin-face.jpg`). The harness-side half has a flat yellow face. The plugs replacing the screen must be the screen-side kind, or they will not mate with the harness. When wiring one, put each function's wire in the same hole the screen's wire for that function uses.
 
@@ -36,7 +36,7 @@ The face side is the mirror image (left and right swap). Photos of both sides: `
 | Plug | Hole | Wire | Key off (V) | Key on (V) | What made it move | Function |
 |---|---|---|---|---|---|---|
 | 9 pin | 1 | orange | 0 | 0 | Up to 12 V with the left blinker | Left turn |
-| 9 pin | 2 | gray/yellow (see note) | 0.4 | 0.4 | Up to 12 V with the headlights | Headlights |
+| 9 pin | 2 | gray/yellow | 0.4 | 0.4 | Up to 12 V with the headlights | Headlights |
 | 9 pin | 6 | pink | 0 | 0 | Up to 12 V with the right blinker | Right turn |
 | 9 pin | 9 | yellow | 0 | 0.15 | Rises while the cart moves | Speed pulse (the meter shows its average) |
 | 9 pin | 8 | red/blue | 7.8 | 68 | Key | Pack voltage, key switched. **Do not use.** |
@@ -51,7 +51,6 @@ The face side is the mirror image (left and right swap). Photos of both sides: `
 | 16 pin | 2 | black | | | | Ground (0 V to the 9 pin black) |
 
 Notes from the owner and the worksheet:
-- 9 pin hole 2 is written "gray" over "green/yellow" on the worksheet, after being described earlier as green and yellow. To confirm.
 - 16 pin red is joined to a yellow wire going into the screen: the factory screen runs its constant and ACC inputs together on switched 12V.
 - 16 pin light blue goes to the underside of the screen. 16 pin white jumps to another connector on the screen's board.
 - 9 pin red/blue showing 7.8 V with the key off is most likely leakage into a meter's high input impedance; it is 68 V with the key on.
