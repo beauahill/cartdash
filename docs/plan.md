@@ -49,9 +49,9 @@ The 12V converter has a keyed enable wire (owner, 2026-11-23; confirm with a met
 
 **Decided 2026-11-23: option B.** Bench test of the head unit: a cold boot takes about 30 s (repeated), while waking from sleep with constant power takes 3 to 4 s. Parts and wiring:
 - Converter: input range covering at least 50 to 80 V (golf cart "48/60/72V to 12V" units with a 30 to 90 V input are typical; a full charge reaches about 73 V), 12 V output (13.8 V is fine), 10 A (5 A if speakers are never connected), non-isolated is fine, and a listed no-load current, ideally under 20 mA.
-- Input from the pack's main positive and negative, not from the screen plug's 68 V wire (that one is keyed). If the cart has a main disconnect or tow/run switch, tap after it so it doubles as the storage switch. Fuse about 5 A right at the tap, and about 10 A on the 12 V output.
+- Input from the pack's main positive and negative, not from the screen plug's 68 V wire (that one is keyed). The cart has a battery disconnect that is set for storage: tap after it, so storage cuts the converter, head unit, and ESP32 to zero draw. Fuse about 5 A right at the tap, and about 10 A on the 12 V output.
 - Output feeds the head unit's yellow (constant) and the ESP32's 12 V to 5 V buck. The head unit's red (ACC) goes to the cart's switched 12V (16 pin hole 4), which the ESP32 also watches through an opto for sleep and wake, as the brief describes.
-- Drain while parked: roughly 1 W (converter idle, head unit and ESP32 asleep), about 0.3% of the pack a day. Set the head unit's sleep duration to a day or two so it then shuts down fully, and use the storage switch over winter.
+- Drain while parked: roughly 1 W (converter idle, head unit and ESP32 asleep), about 0.3% of the pack a day. Set the head unit's sleep duration to a day or two so it then shuts down fully. The battery disconnect covers storage.
 
 ## Order of work
 
