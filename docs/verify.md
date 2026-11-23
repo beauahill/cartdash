@@ -10,7 +10,7 @@ Status: `open`, `partial`, or `done`.
 |---|---|---|---|
 | Chip is UIS7862S | CPU-Z | done 2026-11-23: UIS7862S, 2x Cortex-A75 and 6x Cortex-A55 at 2.0 GHz, Mali-G52 | this file |
 | 8 GB RAM, 128 GB storage | CPU-Z | done: 7556 MB RAM, 106 GB usable storage | this file |
-| Android version is 12 | Settings or CPU-Z. If older, lower `minSdk`. | done: reports "13", but API level 32 and build SP1A.210812.016, so it is Android 12L. `minSdk` 31 is fine; do not rely on Android 13 (API 33) behavior | this file, `android/app/build.gradle.kts` |
+| Android version is 12 | `adb shell getprop ro.build.version.sdk`. If older, lower `minSdk`. | done: Android 12, API 31 (`getprop`, from the owner's head unit notes). The About screen says 13 and CPU-Z said API 32; trust `getprop`. Build SP1A.210812.016, board uis7862s_1h10_Natv. `minSdk` 31 is right; do not rely on anything newer than API 31 | this file, `android/app/build.gradle.kts` |
 | Screen resolution about 2000x1200 | CPU-Z, or `adb shell wm size` | done: 2000 x 1200 | this file |
 | Screen density | `adb shell wm density`, or a debug readout in the app of `densityDpi` and width and height in dp | partial: CPU-Z says 358 dpi, from which it computes a 6.52 inch screen, so it may not be the density the layout uses. At 358 the dash gets about 894 x 536 dp; at 240, about 1333 x 800 dp | this file |
 | Sleeps or shuts down on ACC off | Key off, wait, key on. Does `BOOT_COMPLETED` fire? | open | this file |
@@ -19,8 +19,9 @@ Status: `open`, `partial`, or `done`.
 | Own "default desktop" setting | Head unit settings | open | this file |
 | USB host sees the ESP32 with VBUS cut | Bench test with the cut cable | open | `docs/pinout.md` |
 | Has a GPS receiver and an external antenna | Box contents, GPS test app | open | this file |
+| Vendor platform | Owner's head unit notes | done: TW vendor layer (`com.tw.*` packages, TWCore, config in `/twdataconfig`, vendor system on a second partition `/system_tw`). Not the `syu` FYT variant, so `syu` guides and codes do not apply. Settings app with the code gates: `com.dofun.carsetting` | this file |
 | Google Play services present (not required, the app uses `LocationManager`) | CPU-Z | done: present (21.30.16) | this file |
-| Developer options code (needed for ADB over Wi-Fi) | Seller, manual, or common codes | done 2026-11-23: 7890 plus the current hour (from the owner; 7890 alone does not work). The Factory settings code is 8888. ADB over Wi-Fi steps: `docs/dev_setup.md` | this file |
+| Developer options code (needed for ADB over Wi-Fi) | Seller, manual, or common codes | done 2026-11-23: 7890 followed by the hour on the 24 hour clock, two digits (at 4 PM: 789016), so it changes every hour. Or skip the code: `am start -a android.settings.APPLICATION_DEVELOPMENT_SETTINGS` from ADB or the Engineering page's ADB shell. Settings menu codes: 8888 (user settings) and 123456 (full factory menu). The USB ports are host only, so ADB is over Wi-Fi only. Steps: `docs/dev_setup.md` | this file |
 
 ## Course GPS
 

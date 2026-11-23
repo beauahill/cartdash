@@ -160,9 +160,9 @@ The app starts on its own simulator (SIM badge). Tap SOURCE at the bottom left t
 
 ## ADB to the head unit over Wi-Fi
 
-The head unit's USB ports are hosts (they will talk to the ESP32), so ADB goes over Wi-Fi. Android 12L has Wireless debugging built in.
+The head unit's USB ports are hosts (they will talk to the ESP32), so ADB goes over Wi-Fi. Android 12 has Wireless debugging built in.
 
-1. On the head unit, open Settings, System, Developer options. The code is 7890 plus the current hour. The Factory settings code (8888) is a different menu: change nothing there.
+1. On the head unit, open Settings, System, Developer options. The code is 7890 followed by the hour on the 24 hour clock, two digits: at 4 PM it is 789016, at 9 AM 789009. The settings menus behind 8888 and 123456 are different: change nothing there. Once ADB works, `adb -s <IP>:<port> shell am start -a android.settings.APPLICATION_DEVELOPMENT_SETTINGS` opens Developer options with no code.
 2. In Developer options, turn on USB debugging and Wireless debugging. Put the head unit and the laptop on the same Wi-Fi.
 3. Tap Wireless debugging, then Pair device with pairing code. It shows an address with a pairing port and a six digit code. On the laptop:
 
@@ -185,6 +185,17 @@ Install a build:
 ```bash
 adb -s <IP>:<port> install -r android/app/build/outputs/apk/debug/app-debug.apk
 ```
+
+Make Cart Dash the home app (undo from the Settings home app picker):
+
+```bash
+adb -s <IP>:<port> shell cmd package set-home-activity com.cartdash/.MainActivity
+```
+
+Head unit care:
+- Before changing anything on the unit, save a baseline on the laptop: `pm list packages -U`, `getprop`, and `settings list system`, `secure`, and `global` (each as `adb -s <IP>:<port> shell <command> > file`). Keep it out of the repo: `getprop` includes the unit's serial number.
+- To silence vendor apps use `pm disable-user --user 0 <package>`, never `pm uninstall`. The `com.tw.*` packages carry the MCU link, audio, and boot screen.
+- The Engineering page exposes MCU settings (backlight current, panel timing, CAN profile). Write down a value before changing it. Its ADB shell runs one command at a time with no pipes or redirects.
 
 Fallback without ADB: serve the APK from the laptop and open it in the head unit's browser.
 

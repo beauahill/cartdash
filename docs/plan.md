@@ -116,7 +116,7 @@ Status (2026-11-23):
 - Confirm the ESP32 still enumerates with VBUS cut, on the bench first.
 - The USB attach intent filter goes on a small invisible activity that pokes `LinkService` and closes. If it sits on the dash activity, every replug pulls the dash over CarPlay.
 - `LinkService`: foreground service of type `connectedDevice`, sticky, reconnects with backoff. Started on boot, on launch, on USB attach, and on the head unit's wake broadcast.
-- Many UIS7862 units sleep on ACC off instead of shutting down, so `BOOT_COMPLETED` only fires on a cold boot. Capture `adb logcat` across a key off and on cycle to find the wake broadcast.
+- Many UIS7862 units sleep on ACC off instead of shutting down, so `BOOT_COMPLETED` only fires on a cold boot. Capture `adb logcat` across a key off and on cycle to find the wake broadcast. This unit has the TW vendor layer (`com.tw.*`, TWCore), so look for broadcasts from those packages. Wireless debugging drops while the unit sleeps, so reconnect after wake and dump the buffer with `logcat -d -b all`.
 - Launcher activity: `singleTask`, landscape, keeps the screen on, back does nothing.
 - Test: replug, ESP32 reset, head unit sleep and cold boot, ESP32 sleep and wake, reconnect while CarPlay is in front. Then an overnight run that counts `seq` gaps.
 

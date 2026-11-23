@@ -285,8 +285,8 @@ Do these in order. Each phase ends with something that runs.
 ## Head unit setup (manual, not code)
 
 1. On arrival, install CPU-Z and confirm UIS7862S, 8GB RAM, Android version, and screen resolution. Dispute right away if it does not match.
-2. Enable developer options (code: 7890 plus the current hour) and USB and Wireless debugging. Install the APK with ADB over Wi-Fi (`docs/dev_setup.md`) or from a USB drive.
-3. Set Cart Dash as the default home app. Some TS10 firmware has its own "default desktop" setting that also needs changing.
+2. Enable developer options (code: 7890 then the hour on the 24 hour clock, two digits, for example 789016 at 4 PM) and USB and Wireless debugging. The USB ports are host only, so install the APK with ADB over Wi-Fi (`docs/dev_setup.md`) or from a USB drive.
+3. Set Cart Dash as the default home app (`cmd package set-home-activity com.cartdash/.MainActivity` over ADB). Some TS10 firmware has its own "default desktop" setting that also needs changing.
 4. In the head unit's app management or battery settings, exempt Cart Dash from any background killing or "clean on sleep" feature.
 5. Grant overlay permission if the overlay is used.
 6. Grant Cart Dash location permission. Mount the GPS antenna under the cart roof with a clear view of the sky.
