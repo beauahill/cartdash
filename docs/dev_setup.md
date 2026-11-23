@@ -164,7 +164,7 @@ The head unit's USB ports are hosts (they will talk to the ESP32), so ADB goes o
 
 1. On the head unit, open Settings, System, Developer options. The code is 7890 followed by the hour on the 24 hour clock, two digits: at 4 PM it is 789016, at 9 AM 789009. The settings menus behind 8888 and 123456 are different: change nothing there. Once ADB works, `adb -s <IP>:<port> shell am start -a android.settings.APPLICATION_DEVELOPMENT_SETTINGS` opens Developer options with no code.
 2. In Developer options, turn on USB debugging and Wireless debugging. Join the head unit to the same Wi-Fi as the laptop, as a normal client. Not a guest network: guest networks and some mesh routers stop devices from reaching each other. If wireless CarPlay is active, disconnect the phone first, since CarPlay can take over the head unit's Wi-Fi radio.
-3. Use the SDK's `adb`, not Ubuntu's. `which -a adb` lists every copy on the PATH, and `adb version` must say 30.0.0 or newer for `pair`. Ubuntu 22.04's `adb` package is version 29, and the setup above adds the SDK to the end of the PATH, so Ubuntu's copy wins if it is installed. Use the full path `~/Android/Sdk/platform-tools/adb` (or put `$ANDROID_HOME/platform-tools` first in the PATH). Mixing two versions also makes each one restart the shared adb server, which briefly drops other projects' emulators.
+3. Use the SDK's `adb`, not Ubuntu's. `which -a adb` lists every copy on the PATH, and `adb version` must say 30.0.0 or newer for `pair`. Ubuntu 22.04's `adb` package is version 29, too old; newer Ubuntu releases ship 34, which can pair but is still a different build from the SDK's and from the server Android Studio and the emulator start. Use the full path `~/Android/Sdk/platform-tools/adb` (or put `$ANDROID_HOME/platform-tools` first in the PATH). Mixing two versions also makes each one restart the shared adb server, which briefly drops other projects' emulators.
 4. Tap Wireless debugging, then Pair device with pairing code. A popup shows an address with a pairing port and a six digit code. While the popup is still open, on the laptop:
 
 ```bash
@@ -185,7 +185,7 @@ If pairing fails:
 
 | Message | Cause |
 |---|---|
-| `unknown command`, or a usage listing | Old `adb` (Ubuntu's package). Use the SDK's (step 3). |
+| `unknown command`, or a usage listing | Old `adb` (Ubuntu 22.04's package). Use the SDK's (step 3). |
 | `Failed: Wrong password or connection was dropped` | Code mistyped, popup closed, or the main screen's port was used instead of the popup's. Open a new popup. |
 | `protocol fault (couldn't read status message)` | An older adb server is running because two `adb` versions are in use. Use the SDK's only. |
 | `Unable to connect`, `No route to host`, or a timeout | Network. `ping <head unit IP>` must answer; see step 2. |
