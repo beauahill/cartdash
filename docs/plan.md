@@ -56,7 +56,12 @@ Decision rule: when the head unit arrives, power it on the bench with its consta
 - [x] CI for the Python tools. Firmware and Android jobs get added with Phase 0.
 
 ### Track A: Factory CAN capture (before the Kelly swap)
+
+**Likely not needed (2026-11-23).** The wire worksheet (`docs/pinout.md`) found no CAN bus at the factory screen: every candidate wire sat at millivolts with the key on, where a powered bus idles at about 2.5 V. The screen gets everything it shows from its own wires (blinkers, headlights, forward gear, speed pulse, pack voltage). One ohms check settles it (16 pin holes 13/14 and 15/16, key off). If it confirms, the steps below are dropped, the Kelly swap no longer waits on anything, and the capture tools are kept for sniffing the Kelly in Phase 4.
+
 - [x] `tools/can_capture.py` and `tools/can_log_analyze.py`, tested against synthetic captures. Usage is in `tools/README.md`.
+- [x] Wire worksheet at the factory screen plugs: functions, hole numbers, readings in `docs/pinout.md`.
+- [ ] Ohms check on the two candidate pairs.
 - [ ] Bench check: plug in the CANable, run `can_capture.py check` and `can_capture.py setup`.
 - [ ] Meter checks from the brief (CANH to CANL resistance, idle voltages). For every digital line on both factory plugs also record: does it switch 12V or switch to ground, its voltage, whether it is PWM, and whether it comes from the Tianji or from a switch. Lines that come from the Tianji (speed pulse, speed mode, maybe reverse) disappear after the swap just like its CAN traffic.
 - [ ] Bitrate scan (`can_capture.py scan`).

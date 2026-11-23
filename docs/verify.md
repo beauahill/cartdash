@@ -50,20 +50,21 @@ For each digital line also record: switches 12V or switches to ground, voltage, 
 |---|---|---|---|
 | 16 pin: hole count and wires | Look | done: 16 holes, 8 wires; colors do not match the manual | `docs/pinout.md` |
 | 9 pin: hole count and wires | Look | done: 9 holes, 6 wires | `docs/pinout.md` |
-| Function of each of the 14 wires | Meter, worksheet in `docs/pinout.md` | open | `docs/pinout.md` |
+| 9 pin hole 2 color: gray/yellow or green/yellow | Look | open: the worksheet says gray, earlier described as green and yellow | `docs/pinout.md` |
+| Function of each of the 14 wires | Meter, worksheet in `docs/pinout.md` | done 2026-11-23: blinkers, headlights, forward, speed pulse, switched 12V, pack voltage, grounds; 5 wires show no signal | `docs/pinout.md` |
 | Which wire is constant 12V, and is it live with the key off | Meter, key off | partial: none found at the screen plugs (2026-11-23) | `docs/pinout.md` |
 | Is there constant 12V anywhere on the cart | Meter at the 12V converter output or fuse block, key off | likely none: the converter has a keyed enable (owner); confirm with a meter | `docs/plan.md` |
 | Head unit cold boot time with constant and ACC tied together | Bench, stopwatch, on arrival | open | `docs/plan.md` (power decision) |
 | 9 pin black: 12V ground or pack negative | Volts between the two plug blacks, key on | partial: same ground as the 16 pin black (0 V); confirm with ohms, key off | `docs/pinout.md` |
 | Is the 12V system isolated from the pack, or does the converter share its negative | Key off, ohms between the converter's input and output negatives; and key on, screen unplugged, volts between harness red/blue and black | likely shared: 68 V and 12 V both read against the same black | `docs/pinout.md` |
 | 16 pin red: switched or constant | Meter, key off and on | done: 12 V with the key on only (switched, ACC) | `docs/pinout.md` |
-| Is there a CAN pair at the screen at all (manual functions outnumber wires by 3) | Two wires at about 2.5 V key on, 60 or 120 ohms between them key off | open | `docs/pinout.md` |
+| Is there a CAN pair at the screen at all | Two wires at about 2.5 V key on, 60 or 120 ohms between them key off | likely none: all candidates at millivolts key on; ohms check pending | `docs/pinout.md` |
 | CANH to CANL resistance, cart off (60 or 120 ohms) | Meter | open | `docs/pinout.md` |
 | CAN idle voltages, key on (about 2.5 V each) | Meter | open | `docs/pinout.md` |
-| Speed pulse: amplitude, push-pull or open collector, pulses per wheel turn, source | Scope or meter | open | `docs/pinout.md` |
-| Speed mode lines: driven by a switch or by the Tianji | Meter with the Tianji unplugged, if safe | open | `docs/pinout.md` |
-| Reverse (pin 3): from the gear rocker or the Tianji | Meter | open | `docs/pinout.md` |
-| Where gear D/N/R can be read | Factory CAN capture, Kelly, or gear rocker | open | `docs/protocols.md` |
+| Speed pulse: amplitude, push-pull or open collector, pulses per wheel turn, source | Scope or meter | partial: found on 9 pin hole 9 (yellow); amplitude, pulses per turn, and source (Tianji or sensor) still open | `docs/pinout.md` |
+| Speed mode lines: driven by a switch or by the Tianji | Meter | not at the screen plugs; find at the switch in Phase 2 | `docs/pinout.md` |
+| Reverse signal | Meter | not at the screen plugs (only forward, 16 pin hole 7); find at the gear rocker in Phase 2 | `docs/pinout.md` |
+| Where gear D/N/R can be read | Screen plugs, Kelly, or gear rocker | partial: forward is 16 pin hole 7 (12 V in F); reverse from the rocker or the Kelly | `docs/pinout.md` |
 
 ## Factory CAN bus
 
