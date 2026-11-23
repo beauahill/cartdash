@@ -20,7 +20,7 @@ Status: `open`, `partial`, or `done`.
 | USB host sees the ESP32 with VBUS cut | Bench test with the cut cable | open | `docs/pinout.md` |
 | Has a GPS receiver and an external antenna | Box contents, GPS test app | open | this file |
 | Google Play services present (not required, the app uses `LocationManager`) | CPU-Z | done: present (21.30.16) | this file |
-| Developer options code (needed for ADB over Wi-Fi) | Seller, manual, or common codes | open: the Factory settings code is 8888; the developer options code is not 7890, 3368, 1617, 8888, 1234, 0000, or 123456. Look for a USB debugging switch in Factory settings, or ask the seller. Not blocking: see `docs/dev_setup.md` | this file |
+| Developer options code (needed for ADB over Wi-Fi) | Seller, manual, or common codes | done 2026-11-23: 7890 plus the current hour (from the owner; 7890 alone does not work). The Factory settings code is 8888. ADB over Wi-Fi steps: `docs/dev_setup.md` | this file |
 
 ## Course GPS
 

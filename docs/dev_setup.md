@@ -158,15 +158,41 @@ adb -s emulator-5580 install -r app/build/outputs/apk/debug/app-debug.apk
 
 The app starts on its own simulator (SIM badge). Tap SOURCE at the bottom left to switch to TCP and `fake_esp.py`.
 
-## Installing the app on the head unit without ADB
+## ADB to the head unit over Wi-Fi
 
-The head unit's developer options are locked by a code we do not have yet (its Factory settings code is 8888; change nothing there except a USB or ADB debugging switch, if it has one). Until then, install builds over Wi-Fi from the laptop:
+The head unit's USB ports are hosts (they will talk to the ESP32), so ADB goes over Wi-Fi. Android 12L has Wireless debugging built in.
+
+1. On the head unit, open Settings, System, Developer options. The code is 7890 plus the current hour. The Factory settings code (8888) is a different menu: change nothing there.
+2. In Developer options, turn on USB debugging and Wireless debugging. Put the head unit and the laptop on the same Wi-Fi.
+3. Tap Wireless debugging, then Pair device with pairing code. It shows an address with a pairing port and a six digit code. On the laptop:
+
+```bash
+adb pair <head unit IP>:<pairing port>
+```
+
+4. Type the code when asked. Then connect to the address on the main Wireless debugging screen (a different port from the pairing one):
+
+```bash
+adb connect <head unit IP>:<port>
+```
+
+5. `adb devices` lists it as `<IP>:<port>`. Address it with `adb -s <IP>:<port>`, never bare `adb`, because the emulator is running too.
+
+The port changes each time Wireless debugging restarts (Wi-Fi drop, sleep, reboot), so repeat `adb connect` after a key cycle. Pairing is remembered. This is for the bench only: on the cart the head unit's Wi-Fi belongs to wireless CarPlay, and nothing in the design needs it on Wi-Fi.
+
+Install a build:
+
+```bash
+adb -s <IP>:<port> install -r android/app/build/outputs/apk/debug/app-debug.apk
+```
+
+Fallback without ADB: serve the APK from the laptop and open it in the head unit's browser.
 
 ```bash
 python3 -m http.server 8000 --directory android/app/build/outputs/apk/debug
 ```
 
-On the head unit, open `http://<laptop IP>:8000/app-debug.apk` in the browser and allow it to install. `hostname -I` on the laptop shows its IP; both must be on the same Wi-Fi. Without ADB, the app keeps its own log and shows it on a debug screen.
+Then open `http://<laptop IP>:8000/app-debug.apk` on the head unit and allow the install. `hostname -I` on the laptop shows its IP.
 
 ## 7. Claude Code on the laptop
 

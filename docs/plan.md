@@ -187,7 +187,7 @@ Restyle the app to `docs/dash_design.md`. Nothing here needs cart hardware.
 - [ ] Bundle Barlow Condensed and Barlow in `res/font/` with the OFL license file. Confirm tabular digits keep the speed number from shifting sideways.
 - [ ] Theme tokens for night and day from the spec, the accent glow at night, and the theme override (Auto, Day, Night).
 - [ ] Drive dash, layout A: top bar with signal lights, clock, SIM chip and the single most severe banner; speed dial 0 to 45 mph; center column with gear stack and power bar; battery dial with the SOC color steps; bottom row of four tiles and the CARPLAY, COURSE, and MENU buttons.
-- [ ] Menu: data source, theme, firmware version, the screen readout (`densityDpi`, px and dp size, `u` in px) for the density VERIFY item, and the last 200 `log` lines from the ESP32 for debugging while ADB is locked.
+- [ ] Menu: data source, theme, firmware version, the screen readout (`densityDpi`, px and dp size, `u` in px) for the density VERIFY item, and the last 200 `log` lines from the ESP32 for debugging in the cart without a laptop.
 - [ ] Check in the emulator on every `fake_esp.py` scenario, in both themes, including the cases not yet captured: left blinker, gear R, park brake, SOC under 30% and under 15%, and a `--` in every field.
 - The course screen's look (layout C) is built with `CourseScreen` in Track G2.
 

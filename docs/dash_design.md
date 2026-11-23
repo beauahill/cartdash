@@ -181,7 +181,7 @@ For now it holds:
   - The size of `u` in px.
 
   This answers the screen density VERIFY item in `docs/verify.md` on the real head unit.
-- **App log:** the last 200 `log` lines from the ESP32, for debugging on the head unit while ADB is locked behind the unknown developer options code.
+- **App log:** the last 200 `log` lines from the ESP32, for debugging in the cart without a laptop.
 
 The rest of the settings join in Phase 6.
 
