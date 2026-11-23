@@ -26,7 +26,7 @@ The brief is `README.md`. This file tracks the order of work, status, and decisi
 - [ ] Head unit (ordered). On arrival, run the checks in `docs/verify.md` while it can still be disputed.
 - [ ] Mating connectors: DJ7161Y-2.3-11 (16 pin), DJ7091Y-2.3-11 (9 pin), DJ613-2.3A terminals. Ordered from Amazon 2026-11-10, due end of November. Hole counts confirmed (16 and 9). They must be the screen-side half (square shroud), see `docs/pinout.md`. Alternative: once the factory screen is retired, its own pigtails are ready-made mating plugs. Not needed for the CAN capture (back-probing), needed for Phase 2.
 - [ ] Isolated CANable 2.0 or other candleLight adapter, flashed with candleLight firmware so Linux sees it as `can0` through the `gs_usb` driver.
-- [ ] ESP32-S3 N16R8 board, PC817 and 6N137 optos, small 12V to 5V buck.
+- [ ] ESP32: Waveshare ESP32-S3-Zero, 3-pack ordered 2026-11-23 (ESP32-S3FH4R2: 4 MB flash, 2 MB quad PSRAM, native USB on its USB-C port, about 24 usable pins, onboard RGB LED). Also needed: PC817 and 6N137 optos, small 12V to 5V buck.
 - [ ] Isolated CAN transceiver for the ESP32 to Kelly link. An ADM3053 module is simplest because it makes its own isolated supply. An ISO1050 needs a separate isolated 5V on the bus side.
 - [x] Kelly KAC7250ND on hand.
 
@@ -85,7 +85,7 @@ Firmware:
 - Shared state is one struct behind a mutex with a timestamp per field. The USB task copies it under the lock and builds JSON outside the lock. Staleness is decided at send time, so every data source gets it for free.
 - The simulator drops fields now and then so the app's `--` path gets used from day one. It stays selectable at runtime (`set_config sim`) for bench tests.
 - Config is stored in NVS and written by `set_config`.
-- N16R8 pin map: avoid GPIO 35 to 37 (octal PSRAM), 19 and 20 (USB), and strapping pins 0, 3, 45, 46.
+- Board is the Waveshare ESP32-S3-Zero, not the N16R8 the first build was set up for. Before the first flash, change `firmware/platformio.ini` to 4 MB flash, quad PSRAM (`board_build.arduino.memory_type = qio_qspi`, `board_build.psram_type = qspi`), and a 4 MB partition table with room for a large app (for example `min_spiffs.csv`, two 1.9 MB app slots). Pin map from Waveshare's S3-Zero pinout: avoid 19 and 20 (USB), 26 to 32 (in-package flash and PSRAM), and strapping pins 0, 3, 45, 46; 21 drives the onboard RGB LED, handy as a status light.
 - Native unit tests: JSON output against `protocol/fixtures`, staleness, blinker latch, speed math, and later each decoder.
 
 Android:

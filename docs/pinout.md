@@ -84,4 +84,4 @@ Meter on DC volts, black lead on a black wire, red lead on the wire where it ent
 
 ## ESP32-S3 pin map
 
-Lives in `firmware/include/config.h` once Phase 0 starts. Pins to avoid on an N16R8 board: GPIO 35 to 37 (octal PSRAM), 19 and 20 (USB), 26 to 32 (flash and PSRAM), and strapping pins 0, 3, 45, 46.
+Lives in `firmware/include/config.h`. The board is a Waveshare ESP32-S3-Zero (ESP32-S3FH4R2). Pins to avoid: 19 and 20 (USB), 26 to 32 (in-package flash and PSRAM), and strapping pins 0, 3, 45, 46. GPIO 21 drives the onboard RGB LED. Take the broken-out pins from Waveshare's pinout diagram.

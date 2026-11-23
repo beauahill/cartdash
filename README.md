@@ -37,7 +37,7 @@ USB is the primary link because wireless CarPlay uses the head unit's WiFi radio
 
 | Part | Notes |
 |---|---|
-| ESP32-S3 dev board (N16R8 or similar) | Native USB (CDC ACM), WiFi, BLE, one TWAI (CAN) controller |
+| ESP32-S3 dev board: Waveshare ESP32-S3-Zero (ESP32-S3FH4R2, 4 MB flash, 2 MB PSRAM) | Native USB (CDC ACM), WiFi, BLE, one TWAI (CAN) controller |
 | Isolated CAN transceiver (ISO1050 or ADM3053 module) | Required for the Kelly side. See electrical rules. |
 | Isolated USB to CAN adapter (CANable 2.0 or other candleLight/gs_usb, isolated version) | Laptop sniffing tool for the factory bus and later the Kelly. Works with SocketCAN, python-can, and SavvyCAN. |
 | PC817 opto isolators | One per 12V digital input |
