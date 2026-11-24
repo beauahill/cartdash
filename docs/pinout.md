@@ -84,4 +84,16 @@ Meter on DC volts, black lead on a black wire, red lead on the wire where it ent
 
 ## ESP32-S3 pin map
 
-Lives in `firmware/include/config.h`. The board is a Waveshare ESP32-S3-Zero (ESP32-S3FH4R2). Pins to avoid: 19 and 20 (USB), 26 to 32 (in-package flash and PSRAM), and strapping pins 0, 3, 45, 46. GPIO 21 drives the onboard RGB LED. Take the broken-out pins from Waveshare's pinout diagram. The signal list, the input circuit, and the table to fill in are in `docs/wiring.md`.
+Assigned 2026-11-24 from Waveshare's pin definition for the ESP32-S3-Zero (ESP32-S3FH4R2). The same map is in `firmware/include/config.h` and `docs/wiring.md` (with where each pin sits on the board and why); change all three together. Inputs read active low through optos.
+
+| GPIO | Signal | GPIO | Signal |
+|---|---|---|---|
+| 1 | ACC | 9 | Park brake |
+| 2 | Left turn | 10 | High beam |
+| 4 | Right turn | 11 | Reverse |
+| 5 | Headlights | 12 | Speed mode |
+| 6 | Forward gear | 14 | CAN TX (Phase 4) |
+| 7 | Speed pulse | 15 | CAN RX (Phase 4) |
+| 8 | Brake | 21 | Onboard RGB LED |
+
+Spare: 13, 16. Kept free: 3, 45 (strapping), 43 and 44 (UART0 for debugging). Not broken out: 19 and 20 (USB), 26 to 32 (flash and PSRAM).

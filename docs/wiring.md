@@ -62,15 +62,15 @@ Not connected, tape off each end:
 
 ## Inputs to the ESP32 (Phase 2)
 
-| Signal | Source (screen side hole, wire color) | Input part | Firmware field | Notes |
-|---|---|---|---|---|
-| ACC | 16 pin hole 4, red | PC817 | sleep and wake | Light sleep 60 s after ACC off, wakes on ACC on |
-| Left turn | 9 pin hole 1, orange | PC817 | `turn_left` | Blinker latch in firmware |
-| Right turn | 9 pin hole 6, pink | PC817 | `turn_right` | |
-| Headlights | 9 pin hole 2, gray/yellow | PC817 | `low_beam`, `illum` | Reads 0.4 V when off, below the opto's turn-on point |
-| Forward gear | 16 pin hole 7, white | PC817 | `gear` | Check after the Kelly swap that it still works |
-| Speed pulse | 9 pin hole 9, yellow | 6N137 | `speed_mph` through PCNT | **VERIFY** the amplitude, push-pull or open collector, and pulses per wheel turn before building this channel. Source unknown: may stop after the Kelly swap, then Kelly RPM takes over. |
-| Brake, park brake, high beam, reverse, speed mode | Not at the plugs: tapped at their switches in Phase 2 | PC817 each | `brake`, `park_brake`, `high_beam`, `reverse`, `speed_mode` | Find each wire with a meter at its switch |
+| Signal | Source (screen side hole, wire color) | Input part | GPIO | Firmware field | Notes |
+|---|---|---|---|---|---|
+| ACC | 16 pin hole 4, red | PC817 | 1 | sleep and wake | Light sleep 60 s after ACC off, wakes on ACC on |
+| Left turn | 9 pin hole 1, orange | PC817 | 2 | `turn_left` | Blinker latch in firmware |
+| Right turn | 9 pin hole 6, pink | PC817 | 4 | `turn_right` | |
+| Headlights | 9 pin hole 2, gray/yellow | PC817 | 5 | `low_beam`, `illum` | Reads 0.4 V when off, below the opto's turn-on point |
+| Forward gear | 16 pin hole 7, white | PC817 | 6 | `gear` | Check after the Kelly swap that it still works |
+| Speed pulse | 9 pin hole 9, yellow | 6N137 | 7 | `speed_mph` through PCNT | **VERIFY** the amplitude, push-pull or open collector, and pulses per wheel turn before building this channel. Source unknown: may stop after the Kelly swap, then Kelly RPM takes over. |
+| Brake, park brake, high beam, reverse, speed mode | Not at the plugs: tapped at their switches in Phase 2 | PC817 each | 8, 9, 10, 11, 12 | `brake`, `park_brake`, `high_beam`, `reverse`, `speed_mode` | Find each wire with a meter at its switch |
 
 The opto LED return for every channel above is the factory plug ground (9 pin hole 7 or 16 pin hole 2).
 
@@ -92,7 +92,7 @@ The opto LED return for every channel above is the factory plug ground (9 pin ho
 - The 1N4148 protects the LED from reverse spikes.
 - A ready-made 8 channel PC817 board works too, if its input resistors suit 12 V and its outputs are open collector. Pull the outputs up to the ESP32's 3.3 V, never to 5 V.
 
-The speed pulse uses a 6N137 because a PC817 is too slow for a fast pulse train. A 6N137 runs on 5 V; pull its output up to 3.3 V, not 5 V. Its input resistor depends on the pulse amplitude, which is still to be measured.
+The speed pulse uses a 6N137 because a PC817 is too slow for a fast pulse train. A 6N137 runs on 5 V; pull its output up to 3.3 V with an external 4.7 k, not to 5 V. Its input resistor depends on the pulse amplitude, which is still to be measured.
 
 ## Data links
 
@@ -105,31 +105,37 @@ The speed pulse uses a 6N137 because a PC817 is too slow for a fast pulse train.
 
 ## ESP32 pins
 
-The GPIO numbers get assigned in `firmware/include/config.h` from Waveshare's S3-Zero pinout diagram, once a board is on hand. Rules for choosing:
-- Use GPIOs from 1 to 18, which can also wake the chip from deep sleep if that is ever needed.
-- Avoid:
-  - 0, 3, 45 and 46 (strapping pins).
-  - 19 and 20 (USB).
-  - 26 to 32 (the in-package flash and PSRAM).
-  - 21, which drives the onboard RGB LED. That LED stays as a status light.
-- The CAN controller (TWAI) and the pulse counter (PCNT) can use any GPIO through the pin matrix.
-- Write each final assignment into this table and `docs/pinout.md` in the same commit.
+Assigned 2026-11-24 from Waveshare's S3-Zero pin definition. The board is 18 x 23.5 mm. The same map is in `firmware/include/config.h` and `docs/pinout.md`; change all three together.
 
-| Signal | GPIO |
-|---|---|
-| ACC | |
-| Left turn | |
-| Right turn | |
-| Headlights | |
-| Forward gear | |
-| Speed pulse | |
-| Brake | |
-| Park brake | |
-| High beam | |
-| Reverse | |
-| Speed mode | |
-| CAN TX | |
-| CAN RX | |
+| GPIO | Where on the board | Signal | Phase |
+|---|---|---|---|
+| 1 | Left edge | ACC (wake) | 2 |
+| 2 | Left edge | Left turn | 2 |
+| 4 | Left edge | Right turn | 2 |
+| 5 | Left edge | Headlights | 2 |
+| 6 | Left edge | Forward gear | 2 |
+| 7 | Right edge | Speed pulse (6N137, external 4.7 k pull-up to 3.3 V for clean edges) | 2 |
+| 8 | Right edge | Brake | 2 |
+| 9 | Right edge | Park brake | 2 |
+| 10 | Right edge | High beam | 2 |
+| 11 | Right edge | Reverse | 2 |
+| 12 | Right edge | Speed mode | 2 |
+| 14 | Pad on the top side, beside the right edge | CAN TX to the isolated transceiver | 4 |
+| 15 | Pad on the top side, beside the right edge | CAN RX from the isolated transceiver | 4 |
+| 21 | Onboard | WS2812 RGB status LED | |
+| 13, 16 | Right edge, top side pad | Spare (a second speed mode wire, if the switch has three positions) | |
+
+Power pins on the left edge: 5V (from the 12 V to 5 V buck), GND, and 3V3 (an output, for the opto pull-ups if a board needs them).
+
+How the pins were chosen:
+- All 11 inputs are on the edge pins, so they solder to a header or carrier board. All of them can also wake the chip from deep sleep.
+- Left unused on purpose:
+  - 3, a strapping pin. It is on the left edge, but keep it free.
+  - 43 and 44, UART0 TX and RX on the right edge. The ROM drives TX at boot, and the pair stays free for a debug serial.
+  - 17, 18, 38 to 42, and 45: pads on the bottom of the board, hard to reach. 45 is a strapping pin anyway.
+  - 19 and 20 (USB) and 26 to 32 (flash and PSRAM) are not broken out.
+- The CAN controller (TWAI) and the pulse counter (PCNT) go through the pin matrix, so any GPIO works for them.
+- **VERIFY**: whether the board's USB VBUS reaches the 5V pin directly or through a diode. Either way the USB cable to the head unit has VBUS cut.
 
 ## Parts still to buy
 

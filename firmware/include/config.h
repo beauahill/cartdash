@@ -39,5 +39,24 @@
 #define DEFAULT_SPEED_SRC_RPM true   // true: speed from Kelly motor RPM, false: factory pulse line
 #define DEFAULT_SIM true             // Phase 0: no hardware inputs yet, so simulate
 
-// Pin map for the N16R8 board, filled in from Phase 2.
-// Avoid GPIO 35 to 37 (octal PSRAM), 19 and 20 (USB), and strapping pins 0, 3, 45, 46.
+// Pin map for the Waveshare ESP32-S3-Zero (docs/wiring.md, docs/pinout.md).
+// Every input comes through an opto that pulls the pin low while the cart
+// signal is on, so inputs use the internal pull-up and read active low.
+// Avoid: 0, 3, 45, 46 (strapping), 19 and 20 (USB), 26 to 32 (in-package flash
+// and PSRAM), 43 and 44 (UART0, kept free for a debug serial).
+#define INPUT_ACTIVE_LOW true
+#define PIN_ACC 1              // left edge
+#define PIN_TURN_LEFT 2        // left edge
+#define PIN_TURN_RIGHT 4       // left edge
+#define PIN_HEADLIGHTS 5       // left edge, low beam and illum
+#define PIN_FORWARD 6          // left edge
+#define PIN_SPEED_PULSE 7      // right edge, 6N137, pulse counter (PCNT)
+#define PIN_BRAKE 8            // right edge
+#define PIN_PARK_BRAKE 9       // right edge
+#define PIN_HIGH_BEAM 10       // right edge
+#define PIN_REVERSE 11         // right edge
+#define PIN_SPEED_MODE 12      // right edge
+#define PIN_CAN_TX 14          // top side pad, to the isolated transceiver (Phase 4)
+#define PIN_CAN_RX 15          // top side pad
+#define PIN_STATUS_LED 21      // onboard WS2812 RGB LED
+// Spare: 13 (right edge), 16 (top side pad), 17, 18, 38 to 42 (bottom pads).
