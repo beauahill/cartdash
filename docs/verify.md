@@ -78,10 +78,11 @@ For each digital line also record: switches 12V or switches to ground, voltage, 
 
 | Item | How to check | Status | Record in |
 |---|---|---|---|
-| Bluetooth works | JBD app connects | partial (JBD app in use) | this file |
-| Protocol is JBD | nRF Connect shows service `FF00` with `FF01` and `FF02` | partial (JBD app in use) | `docs/protocols.md` |
-| Whether reads need the PIN | Try reading without it | open | `docs/protocols.md` |
-| Current sign and scale, temperature sensor count | Compare to the JBD app | open | `docs/protocols.md` |
+| Bluetooth works | JBD app connects, then `tools/bms_probe.py --scan` from the laptop | partial: the owner's JBD app connects (2026-11-24) | this file |
+| Protocol is JBD | `tools/bms_probe.py --address <addr>` lists service `FF00` with `FF01` and `FF02` and decodes a read | partial (JBD app in use) | `docs/protocols.md` |
+| Whether reads need the PIN | `tools/bms_probe.py` reads without it | open | `docs/protocols.md` |
+| Current sign and scale, temperature sensor count | `tools/bms_probe.py --watch 60 --save charging` and a parked or driving run, compared with the JBD app | open | `docs/protocols.md` |
+| Bluetooth signal from where the ESP32 will sit | ESP32 logs the BMS signal strength (RSSI) at its mounting spot; the laptop's `--scan` from the same spot is a first check | open | this file |
 
 ## Kelly KAC7250ND
 

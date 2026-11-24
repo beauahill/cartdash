@@ -5,6 +5,8 @@
 | `can_capture.py` | Listen-only CAN captures with typed markers, on a Linux laptop |
 | `can_log_analyze.py` | Finds the bytes that matter in those captures |
 | `fake_esp.py` | Pretends to be the ESP32, for building the app without hardware |
+| `bms_probe.py` | Talks to the BMS over Bluetooth from the laptop, decodes it, and saves raw frames as test data |
+| `jbd.py` | JBD BMS frame decoder, the reference for the firmware's `bms_jbd.cpp` |
 | `cartdash_proto.py` | Reference rules for reading the USB link, used by the other tools and tests |
 | `course_from_osm.py` | Builds a course file from OpenStreetMap and reports which holes are missing data |
 | `course_imagery.py` | Downloads the public domain USGS aerial photo for a course |
@@ -281,6 +283,44 @@ In the overview, a magenta outline is a green that is not linked to a hole and a
 ```bash
 pip install matplotlib pillow
 ```
+
+---
+
+# BMS probe
+
+`bms_probe.py` connects to the BMS from the laptop the same way the ESP32 will (JBD service `FF00`, requests on `FF02`, answers on `FF01`). It confirms the protocol, shows whether reads need the PIN, and saves raw notifications that become the firmware decoder's test data. Needs the laptop's Bluetooth and `bleak` (in `requirements.txt`).
+
+The BMS takes one Bluetooth connection at a time. Close the JBD app on the phone, or turn the phone's Bluetooth off, before each run.
+
+1. Find the BMS. It is usually the strongest signal next to the cart:
+
+```bash
+python3 tools/bms_probe.py --scan
+```
+
+2. Read it once and compare every line with the JBD app (open the app again afterwards to look, then close it):
+
+```bash
+python3 tools/bms_probe.py --address AA:BB:CC:DD:EE:FF --save parked
+```
+
+3. Save a few more situations, each about 60 s, writing down what the JBD app showed during each:
+
+```bash
+python3 tools/bms_probe.py --address AA:BB:CC:DD:EE:FF --watch 60 --save charging
+```
+
+Useful labels: `parked` (key off, no load), `charging` (charger on, current should be positive), `lights` (key on, headlights on, a small negative current). A drive needs the laptop in the cart: `driving`, current strongly negative.
+
+4. Decode a saved file again at any time, no Bluetooth needed:
+
+```bash
+python3 tools/bms_probe.py --replay captures/bms/2026-11-24-1015-parked.jsonl
+```
+
+Commit the files in `captures/bms/` with a note of the JBD app's readings for each in `captures/README.md`. They hold only BMS readings and the BMS's Bluetooth address; never put the PIN in them.
+
+If no answer comes back, the tool says so: either the phone still holds the connection, or this BMS wants its PIN before it answers reads. Do not put the PIN on the command line or in a file in the repo; tell Claude and it goes in `firmware/include/secrets.h` only.
 
 ---
 

@@ -70,7 +70,7 @@ Sent about 10 times a second.
 | `brake`, `park_brake` | boolean | | Opto | |
 | `reverse` | boolean | | Opto | |
 | `illum` | boolean | | Opto | Headlights on. Drives the night theme. |
-| `kelly_faults`, `bms_faults` | array of strings | | Kelly, BMS | Short fault codes. `[]` means no faults. Missing means unknown. |
+| `kelly_faults`, `bms_faults` | array of strings | | Kelly, BMS | Short fault codes. `[]` means no faults. Missing means unknown. BMS codes are listed in `docs/protocols.md`. |
 | `stale` | array of strings | | ESP32 | Names of fields whose reading is more than 2 s old. |
 
 Every field except `type`, `seq`, and `t` is optional.

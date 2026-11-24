@@ -127,10 +127,19 @@ Status (2026-11-23):
 - ACC off for 60 s goes to light sleep with ACC as the wake source, after one final MQTT publish.
 
 ### Phase 3: BMS over BLE (JBD)
-- Confirm with nRF Connect on a phone that the BMS shows the JBD service (`FF00`, notify `FF01`, write `FF02`) before writing firmware. Notes are in `docs/protocols.md`.
-- NimBLE-Arduino, which is much lighter than Bluedroid.
+
+The owner's JBD app connects to the BMS (2026-11-24). Steps, in order:
+
+1. [ ] Laptop probe (`tools/bms_probe.py`, guide in `tools/README.md`): find the BMS address, confirm the JBD service (`FF00`, notify `FF01`, write `FF02`), confirm reads work without the PIN, and save captures parked, charging, and with a load, noting the JBD app's readings for each in `captures/README.md`. This answers the BMS rows in `docs/verify.md` before any firmware is written. Reference decoder: `tools/jbd.py`, tested.
+2. [ ] Firmware decoder `bms_jbd.cpp`: a port of `tools/jbd.py` (frame assembler across notifications, checksum, basic info, cells, fault codes), pure functions with native tests that replay the files in `captures/bms/` and must agree with `tools/jbd.py` on every frame.
+3. [ ] BLE client task `bms_ble.cpp` with NimBLE-Arduino (much lighter than Bluedroid): connect to the BMS address from `config.h`, subscribe to `FF01`, ask for basic info every 1 s and cells every 2 s, write the results into shared state with their timestamps so staleness works as it does for every other field. If no answer arrives for 5 s, drop the connection and reconnect with backoff. Log the signal strength (RSSI) as a `log` line on connect. The PIN, if reads turn out to need it, comes from `secrets.h` only.
+4. [ ] Simulator stays: with `sim` on, the BMS task does not connect.
+5. [ ] Bench test on the S3-Zero next to the cart, then in its mounting spot: watch `soc_pct`, `cell_v_*`, and `bms_temp_f` on the dash, and the BMS fields go to `--` within 2 s when the BMS is out of range.
+
+Notes:
+- **One connection at a time.** While the ESP32 is awake it holds the BMS connection, so the JBD phone app cannot connect with the key on. With the key off, the ESP32 sleeps after 60 s and lets go, and the phone app works again. That is enough for changing BMS settings, so there is no "release the BMS" command for now.
 - WiFi and BLE share one radio. Back off WiFi reconnect attempts while home WiFi is not in range.
-- If no BMS data arrives for a few seconds, drop the connection and reconnect.
+- The app needs nothing new: it already shows every BMS field, and `bms_faults` banners.
 
 ### Phase 4: Kelly decode
 - Look for Kelly's CAN protocol document for the KAC-N series first. Some Kelly controllers broadcast status frames, others only answer requests. If this one only answers, listen-only sniffing shows a silent bus and the ESP32 has to send requests on the Kelly bus. That is allowed; the no-transmit rule is for the factory bus.

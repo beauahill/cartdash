@@ -49,6 +49,12 @@ Cell voltages data: one big endian 16 bit value per cell, in mV.
 
 The JBD current sign already matches the USB link convention (negative is discharge).
 
+Fault codes sent in `bms_faults` on the USB link, one per protection flag bit: 0 `cell_ov`, 1 `cell_uv`, 2 `pack_ov`, 3 `pack_uv`, 4 `chg_ot`, 5 `chg_ut`, 6 `dsg_ot`, 7 `dsg_ut`, 8 `chg_oc`, 9 `dsg_oc`, 10 `short`, 11 `afe_error`, 12 `fet_lock`. Plus `dsg_fet_off` whenever the discharge FET is off, because the cart then has no power. A charge FET that is off alone is not a fault: the BMS opens it when the pack is full.
+
+Newer JBD firmware appends more bytes after the temperatures in basic info. The decoder ignores them.
+
+Reference decoder: `tools/jbd.py`, with tests in `tools/tests/test_jbd.py`. `tools/bms_probe.py` runs it against the real BMS from the laptop and saves raw frames in `captures/bms/` for the firmware tests.
+
 ## Factory CAN bus (original Tianji controller to factory screen)
 
 Status: **not present on this cart** (2026-11-23). The factory screen has no CAN bus; it reads blinkers, headlights, forward gear, a speed pulse, and pack voltage on its own wires (`docs/pinout.md`). The table below is unused.
