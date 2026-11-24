@@ -102,6 +102,7 @@ The speed pulse uses a 6N137 because a PC817 is too slow for a fast pulse train.
 | CAN (Phase 4) | ESP32 TWAI and the Kelly | An isolated transceiver with built-in isolated power (an ADM3053 module) is simplest. An ISO1050 also needs a small isolated 5 V supply for its bus side. | Termination: 120 ohms at each end of the bus; check whether the Kelly has its own. **VERIFY** that the Kelly exposes CAN at all. |
 | BMS | ESP32 and the JBD BMS | Bluetooth LE | **VERIFY** the signal strength at the ESP32's mounting spot (`docs/bms_test.md`, step 5). |
 | GPS | Head unit and its antenna | The head unit's GPS antenna lead | Antenna under the cart roof with a clear view of the sky. |
+| FM radio | Head unit antenna input and the factory FM antenna lead | The lead comes up through the dash pod's floor with a Motorola plug (`docs/bezel.md`) | Optional, only for FM radio. |
 
 ## ESP32 pins
 

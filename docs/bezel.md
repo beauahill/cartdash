@@ -1,10 +1,56 @@
 # Bezel
 
-A new bezel to mount the Topway TS10s where the factory screen was. **Status: collecting measurements.** The design will be parametric (OpenSCAD) in `mechanical/bezel/`, so a wrong number is a one-line fix and a reprint, not a redesign.
+Mounting the Topway TS10s where the factory screen was. **Status: measuring.** The design will be parametric (OpenSCAD) in `mechanical/bezel/`, so a wrong number is a one-line fix and a reprint, not a redesign.
 
-## Measurements needed
+## The factory setup (photos 2026-11-24)
 
-Millimeters if you can; inches are fine if every number uses the same unit. Write "about" next to anything you are unsure of. A photo with a tape measure or ruler in the frame helps more than a number on its own.
+- **Pod.** A box-shaped pod sits on top of the dash, in front of the steering column. It is screwed down to the dash from inside, through its floor, with about seven screws around a cable hole. Its top runs a little past the face, which makes a short built-in sun hood. The face leans back toward the windshield. Photos: `photos/dash-pod-side.jpg`, `photos/dash-pod-top.jpg`, `photos/dash-pod-open-front.jpg`, `photos/dash-pod-open-angle.jpg`.
+- **Face plate.** A plate carries the factory screen, whose metal frame screws to the plate's back. The plate screws onto the pod at four bosses: two along the top and one on each side wall. Photos: `photos/factory-faceplate-front.jpg`, `photos/factory-faceplate-back.jpg`, `photos/factory-faceplate-side.jpg`.
+- **Through the pod floor:** the 9 and 16 pin plugs, and an FM antenna lead with a Motorola plug. The head unit's radio antenna input can take that lead.
+
+## Two ways to go
+
+1. **A new face plate on the existing pod (try this first).**
+   - It screws into the four bosses and holds the TS10s by its side mounting holes, through a bracket printed as part of the plate.
+   - It keeps the factory look and the built-in hood, adds no new holes in the dash, and is the smallest print.
+   - It works if two things are true:
+     - The TS10s front panel fits within, or close to, the pod's face. The plate can stand a little proud of the face.
+     - The TS10s body, with its plugs and cables, fits inside the pod's depth and can reach the floor hole.
+2. **A new pod and face plate, if the TS10s does not fit.**
+   - It screws to the dash through the same holes as the old pod, so the dash stays untouched.
+   - It lets us size the hood for sun, set the screen angle, and leave room for the ESP32 box.
+   - It is a bigger print, in several parts.
+
+What decides between them: the head unit's H1, H5, and H8 against the pod's P1 to P3 below.
+
+## Measurements
+
+Millimeters if you can; inches are fine if every number uses the same unit. Write "about" next to anything you are unsure of.
+
+### First: trace the old face plate
+
+This gives the face outline and the screw positions more accurately than anything else.
+
+1. Lay the face plate face down on a sheet of paper or cardboard bigger than it, and trace around it.
+2. Measure the center of each of the four bosses from the two nearest edges of the plate, and write the numbers on the tracing, next to that boss.
+3. Write down the boss height, measured from the back of the plate.
+4. Photograph the tracing straight down, with a tape measure lying along two edges.
+
+The factory screen can stay in the plate while you do this.
+
+### The pod
+
+| # | What | Value |
+|---|---|---|
+| P1 | Opening at the face, inside: width along the top, width along the bottom, height | |
+| P2 | Depth, straight in from the face to the back wall, at the center | |
+| P3 | Inside size at the back wall: width x height (the pod tapers) | |
+| P4 | Floor cable hole: its size, and its distance from the face and from the left wall | |
+| P5 | How far the top (the hood) reaches past the face | |
+| P6 | Angle of the face from vertical: a phone level app held flat on the installed face plate | |
+| P7 | One of the four boss screws, taken out: thread diameter and length | |
+| P8 | Steering wheel rim to the face, at the closest point | |
+| P9 | Only for a new pod: the dash under it. Trace the pod's footprint and its screw holes on paper with the pod off, and photograph the bare dash with a tape across it | |
 
 ### The head unit
 
@@ -21,35 +67,18 @@ Millimeters if you can; inches are fine if every number uses the same unit. Writ
 | H9 | Anything on the front that must stay uncovered: buttons, microphone hole, light sensor, reset hole. Positions from the panel edges | |
 | H10 | Weight (a kitchen scale is fine) | |
 
-Photos: the front straight on, the back, each side (showing the mounting holes), and the rear with the cables plugged in.
-
-### The dash
-
-| # | What | Value |
-|---|---|---|
-| D1 | Factory screen opening: width x height, and the corner radius (round, sharp, or about how big) | |
-| D2 | How the factory screen is held: screws, clips, or a bracket, and where they sit relative to the opening | |
-| D3 | Dash panel thickness at the edge of the opening | |
-| D4 | Depth behind the opening to the first obstruction (steering column, frame tube, wiring), at the center and at each corner | |
-| D5 | Free space on the dash face around the opening: how far the bezel can extend left, right, up, and down before it hits switches, vents, or curves | |
-| D6 | Is the face flat around the opening? Lay a straight edge across the opening, side to side and then top to bottom, and measure the biggest gap under it | |
-| D7 | Angle of the dash face from vertical, with a phone level app laid flat on it | |
-| D8 | Distance from the steering wheel rim to the dash face in front of the opening, at the closest point | |
-| D9 | Where the ESP32 box (about 100 x 70 x 40 mm) could mount behind the dash, close to the factory plugs | |
-
-Photos: the opening straight on from about 1 m, with a tape across it; the same from the driver's seat at eye height; a side view showing the angle and the steering wheel; behind the dash through the opening, showing D4.
-
-If the dash face is curved, a cardboard template beats numbers. Press a piece of cardboard against the face, trace the opening and the outline the bezel may cover, cut it out, and photograph it flat next to a ruler.
+Photos of the head unit: the front straight on, the back, each side (showing the mounting holes), and the back with the cables plugged in, each with a ruler in the frame.
 
 ## Questions
 
-- Do you have a 3D printer? What is its bed size? The bezel for a 10 inch screen may be wider than the bed. If so it prints in two pieces that bolt or key together behind the face.
+- Do you have a 3D printer? What is its bed size? A plate for a 10 inch screen may be wider than the bed. If so it prints in two pieces that bolt or key together behind the face.
 - Which filament? ASA is best in a cart: it takes sun and heat. PETG is fine. PLA softens in a hot cart and is not recommended.
-- Do you want a small sun hood over the top of the screen? It helps readability in direct sun. Sun readability is the dash's hardest requirement.
-- Should the bezel match the dash color, or plain black?
+- The pod's hood is short. Do you want a deeper one? A deeper hood helps the screen in direct sun, which is the dash's hardest requirement.
+- Plain black, or matched to anything?
 
 ## Design notes
 
-- The head unit body mounts to a bracket through its side holes. The bezel covers the gap between the screen and the opening. The dash does not carry the head unit by its front panel alone.
-- The head unit's metal case must not touch the cart frame (`docs/wiring.md`, grounds).
-- Leave a path for the USB, GPS, and harness cables, and room to unplug the head unit without removing the dash.
+- The head unit body mounts to a bracket through its side holes. The plate does not carry the head unit by its glass or front frame alone.
+- The head unit's metal case must not touch the cart frame (`docs/wiring.md`, grounds). The pod and plate are plastic, so this holds as long as no screw reaches the frame.
+- Leave a path from the head unit's back to the floor hole for the harness, USB, GPS, and FM antenna leads. Leave room to unplug the head unit without taking the pod off.
+- The ESP32 box (with its 5 V buck and opto board, roughly 100 x 70 x 40 mm) goes inside the pod beside the head unit body if P2, P3, and H5 leave room. Otherwise it goes under the dash near the plugs.
