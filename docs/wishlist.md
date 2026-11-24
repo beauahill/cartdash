@@ -21,3 +21,13 @@ Possible approach when it gets picked up:
 - Stay awake while the BMS reports charge current, publishing at a slower rate.
 - Otherwise wake on a timer every 10 to 15 minutes, read the BMS, publish, and sleep again.
 - First confirm that the 12V converter (factory pin 9) stays on with the key off, and how much it draws.
+
+## Reading the DROK shunt monitor
+
+The DROK 200A shunt on the main negative has its own display. Reading it into the ESP32 is not planned, because the other sources cover it:
+- The BMS measures all pack current, charge included, and gives SOC. The shunt does not see charge current.
+- After Phase 4 the Kelly reports battery current faster than the BMS does.
+- Measuring the shunt directly would mean a 75 mV measurement on the main negative, which is the cable that shifts under motor current, plus another wire run to the pack.
+
+The DROK display can stay as a standalone backup gauge. Pick this up only if the BMS Bluetooth link turns out unreliable on the cart. If the DROK model has Bluetooth, reading that would be the easier route.
+

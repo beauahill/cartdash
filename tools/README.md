@@ -292,6 +292,8 @@ pip install matplotlib pillow
 
 The BMS takes one Bluetooth connection at a time. Close the JBD app on the phone, or turn the phone's Bluetooth off, before each run.
 
+For the first test at the cart, follow the checklist in `docs/bms_test.md`.
+
 1. Find the BMS. It is usually the strongest signal next to the cart:
 
 ```bash

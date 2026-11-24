@@ -8,6 +8,7 @@ Read these first:
 Where things are:
 - `docs/pinout.md`: the factory screen plugs, measured: hole numbers, wire colors, functions, photos in `docs/photos/`.
 - `docs/usb_protocol.md`, `protocol/schema/`, `protocol/fixtures/`: the ESP32 to app protocol. The fixtures are shared test data: the firmware native tests and the Android unit tests must check against them, as `tools/tests/test_protocol.py` does.
+- `docs/wiring.md`: how the new parts connect (power, fuses, grounds, opto inputs, data links), parts still to buy. `docs/bezel.md`: head unit bezel measurements and design notes. `docs/bms_test.md`: the laptop BMS test checklist.
 - `docs/dash_design.md`, `docs/design/`: the chosen look of the drive dash and course screen (colors, fonts, layout in `u`) and the mockup sources.
 - `docs/course_format.md`, `courses/`: course files, aerial photos, and overrides for the five courses. `tools/courselib.py` holds the yardage math the app ports to `course/Yardage.kt`; port its tests too.
 - `tools/`: Python tools and their tests (`python3 -m pytest tools/tests -q`). `tools/fake_esp.py` stands in for the ESP32 while building the app.

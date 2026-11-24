@@ -24,12 +24,36 @@ The brief is `README.md`. This file tracks the order of work, status, and decisi
 
 ## Hardware status
 
-- [ ] Head unit (ordered). On arrival, run the checks in `docs/verify.md` while it can still be disputed.
+- [x] Head unit on hand: CPU-Z checks done, ADB over Wi-Fi paired (2026-11-24). Remaining head unit checks are in `docs/verify.md`.
 - [ ] Mating connectors: DJ7161Y-2.3-11 (16 pin), DJ7091Y-2.3-11 (9 pin), DJ613-2.3A terminals. Ordered from Amazon 2026-11-10, due end of November. Hole counts confirmed (16 and 9). They must be the screen-side half (square shroud), see `docs/pinout.md`. Alternative: once the factory screen is retired, its own pigtails are ready-made mating plugs. Not needed for the CAN capture (back-probing), needed for Phase 2.
 - [ ] Isolated CANable 2.0 or other candleLight adapter, flashed with candleLight firmware so Linux sees it as `can0` through the `gs_usb` driver.
 - [ ] ESP32: Waveshare ESP32-S3-Zero, 3-pack ordered 2026-11-23 (ESP32-S3FH4R2: 4 MB flash, 2 MB quad PSRAM, native USB on its USB-C port, about 24 usable pins, onboard RGB LED). Also needed: PC817 and 6N137 optos, small 12V to 5V buck.
 - [ ] Isolated CAN transceiver for the ESP32 to Kelly link. An ADM3053 module is simplest because it makes its own isolated supply. An ISO1050 needs a separate isolated 5V on the bus side.
 - [x] Kelly KAC7250ND on hand.
+- [ ] Power and input parts: converter, fuses (F1 rated 80 V DC or more), 5 V buck, optos, USB VBUS blocker, wire, enclosure. List in `docs/wiring.md`.
+
+## Next, while waiting for the ESP32 and the plugs
+
+None of these need the new parts. Rough order:
+
+1. **BMS laptop test** (`docs/bms_test.md`): confirms the JBD protocol and saves the captures the firmware decoder is built against.
+2. **Head unit checks over ADB** (laptop CLI): density, CarPlay package, vendor version, then the wake broadcast across an ACC off and on cycle on the bench (`docs/verify.md`).
+3. **Track D, the dash restyle** (laptop CLI), then **Track G2, the yardage engine and course screen**. Both are app only.
+4. **Bezel measurements** (`docs/bezel.md`), then the parametric bezel design.
+5. **Order the power and input parts** in `docs/wiring.md`, so they are on hand with the ESP32. Review the wiring diagram first.
+6. **Speed pulse**: measure its frequency while rolling, if the meter has a Hz setting. That sizes the 6N137 input.
+
+When the ESP32 boards arrive:
+- Finish Phase 0: change `platformio.ini` for the S3-Zero, flash, and watch the stream.
+- Phase 1: the USB link to the head unit.
+- Phase 3: the BMS over Bluetooth. It needs no cart wiring, only the board on USB power near the cart, so it can come before Phase 2.
+
+When the plugs arrive:
+- Test fit them against the harness.
+- Build the adapter harness and the opto board.
+- Phase 2: the inputs.
+
+The Kelly swap can happen any time. Phase 4 follows it.
 
 ## Build environment
 
