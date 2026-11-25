@@ -18,7 +18,7 @@ Mounting the Topway TS10s where the factory screen was. **Status: measuring.** T
      - The TS10s body, with its plugs and cables, fits inside the pod's depth and can reach the floor hole.
 2. **A new pod and face plate, if the TS10s does not fit.**
    - It screws to the dash through the same holes as the old pod, so the dash stays untouched.
-   - It lets us size the hood for sun, set the screen angle, and leave room for the ESP32 box.
+   - It lets us set the screen angle and leave room for the ESP32 box.
    - It is a bigger print, in several parts.
 
 What decides between them: the head unit's H1, H5, and H8 against the pod's P1 to P3 below.
@@ -80,9 +80,10 @@ The owner's printer is a Bambu Lab H2S: enclosed, with a heated chamber, and a b
 - **Fit test first.** Print a thin outline of the plate with the four boss holes, about 2 mm thick, and check it against the pod. It takes a few minutes and little filament. If anything is off, fix it before the full plate.
 - **Files.** The design comes as an OpenSCAD file plus a ready STL or 3MF in `mechanical/bezel/`, which Bambu Studio opens directly.
 
-## Questions
+## Decided
 
-- The pod's hood is short. Do you want a deeper one? A deeper hood helps the screen in direct sun, which is the dash's hardest requirement.
+- No deeper sun hood (owner, 2026-11-25). The pod's own short hood stays as it is.
+- Black ASA.
 
 ## Design notes
 
