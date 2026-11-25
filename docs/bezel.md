@@ -69,10 +69,19 @@ The factory screen can stay in the plate while you do this.
 
 Photos of the head unit: the front straight on, the back, each side (showing the mounting holes), and the back with the cables plugged in, each with a ruler in the frame.
 
+## Printing
+
+The owner's printer is a Bambu Lab H2S: enclosed, with a heated chamber, and a bed of roughly 340 x 320 mm (check the exact size in Bambu Studio). So:
+- **One piece.** A plate for a 10 inch screen fits on the bed, so it needs no split and no joint.
+- **ASA.** The heated chamber keeps ASA from warping, and ASA takes sun and cart heat. PETG is the fallback. PLA softens in a hot cart and is not recommended.
+- **Face down on the textured PEI plate.** The visible face then comes out matte and textured, close to the factory plastic, with no supports on it.
+- **Strength settings:** about 4 walls and 25% infill.
+- **Threads:** heat-set brass inserts where the head unit bracket screws in, so the threads survive repeated removal. The plate gets plain through holes for the four boss screws, which are the factory screws reused.
+- **Fit test first.** Print a thin outline of the plate with the four boss holes, about 2 mm thick, and check it against the pod. It takes a few minutes and little filament. If anything is off, fix it before the full plate.
+- **Files.** The design comes as an OpenSCAD file plus a ready STL or 3MF in `mechanical/bezel/`, which Bambu Studio opens directly.
+
 ## Questions
 
-- Do you have a 3D printer? What is its bed size? A plate for a 10 inch screen may be wider than the bed. If so it prints in two pieces that bolt or key together behind the face.
-- Which filament? ASA is best in a cart: it takes sun and heat. PETG is fine. PLA softens in a hot cart and is not recommended.
 - The pod's hood is short. Do you want a deeper one? A deeper hood helps the screen in direct sun, which is the dash's hardest requirement.
 - Plain black, or matched to anything?
 
