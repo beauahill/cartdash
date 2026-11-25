@@ -73,7 +73,7 @@ Photos of the head unit: the front straight on, the back, each side (showing the
 
 The owner's printer is a Bambu Lab H2S: enclosed, with a heated chamber, and a bed of roughly 340 x 320 mm (check the exact size in Bambu Studio). So:
 - **One piece.** A plate for a 10 inch screen fits on the bed, so it needs no split and no joint.
-- **ASA.** The heated chamber keeps ASA from warping, and ASA takes sun and cart heat. PETG is the fallback. PLA softens in a hot cart and is not recommended.
+- **Black ASA**, on hand. The heated chamber keeps ASA from warping, and ASA takes sun and cart heat.
 - **Face down on the textured PEI plate.** The visible face then comes out matte and textured, close to the factory plastic, with no supports on it.
 - **Strength settings:** about 4 walls and 25% infill.
 - **Threads:** heat-set brass inserts where the head unit bracket screws in, so the threads survive repeated removal. The plate gets plain through holes for the four boss screws, which are the factory screws reused.
@@ -83,7 +83,6 @@ The owner's printer is a Bambu Lab H2S: enclosed, with a heated chamber, and a b
 ## Questions
 
 - The pod's hood is short. Do you want a deeper one? A deeper hood helps the screen in direct sun, which is the dash's hardest requirement.
-- Plain black, or matched to anything?
 
 ## Design notes
 
